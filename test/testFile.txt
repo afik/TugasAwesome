@@ -24,6 +24,15 @@ level 21 : gE269g2h3mw3pwgrj0Ha9Uoqen1c9DGr
 
 
 
-	
+*.class
 
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
 
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
