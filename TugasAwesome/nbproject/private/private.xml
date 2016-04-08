@@ -5,8 +5,11 @@
         <group>
             <file>file:/D:/AFIK/Project/T(ugas)%20A(wesome)/TugasAwesome/src/id/ac/itb/informatika/tugasawesome/main/TugasAwesome.java</file>
             <file>file:/D:/AFIK/Project/T(ugas)%20A(wesome)/TugasAwesome/src/id/ac/itb/informatika/tugasawesome/process/Encryption.java</file>
-            <file>file:/D:/AFIK/Project/T(ugas)%20A(wesome)/TugasAwesome/src/id/ac/itb/informatika/tugasawesome/utils/WordProcessor.java</file>
-            <file>file:/D:/AFIK/Project/T(ugas)%20A(wesome)/TugasAwesome/src/id/ac/itb/informatika/tugasawesome/utils/FileProcessor.java</file>
+            <file>file:/D:/AFIK/Project/T(ugas)%20A(wesome)/TugasAwesome/src/id/ac/itb/informatika/tugasawesome/process/Shamir.java</file>
+            <file>file:/D:/AFIK/Project/T(ugas)%20A(wesome)/TugasAwesome/src/id/ac/itb/informatika/tugasawesome/process/PointByte.java</file>
+            <file>file:/D:/AFIK/Project/T(ugas)%20A(wesome)/TugasAwesome/src/id/ac/itb/informatika/tugasawesome/process/SecretShare.java</file>
+            <file>file:/D:/AFIK/Project/T(ugas)%20A(wesome)/TugasAwesome/src/id/ac/itb/informatika/tugasawesome/process/Mapping.java</file>
+            <file>file:/D:/AFIK/Project/T(ugas)%20A(wesome)/TugasAwesome/src/id/ac/itb/informatika/tugasawesome/utils/ByteArrayOp.java</file>
         </group>
     </open-files>
 </project-private>

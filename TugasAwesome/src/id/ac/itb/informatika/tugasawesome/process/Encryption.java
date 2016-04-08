@@ -1,5 +1,6 @@
 package id.ac.itb.informatika.tugasawesome.process;
 
+import id.ac.itb.informatika.tugasawesome.utils.ByteArrayOp;
 import java.util.Arrays;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -26,7 +27,7 @@ public class Encryption {
             IvParameterSpec ivSpec = new IvParameterSpec(IV.getBytes("UTF-8"));
             cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
             
-            encrypted =  cipher.doFinal(addBytes(PAD, plain));
+            encrypted =  cipher.doFinal(ByteArrayOp.addBytes(PAD, plain));
         } catch (Exception e) {
             System.err.format("Encrypt exception : " + e.getMessage());
             e.printStackTrace();
@@ -77,19 +78,6 @@ public class Encryption {
             System.err.format("Generate key exception : " + e.getMessage());
         }
         return keyByte;
-    }
-    
-    public static byte[] addBytes(byte[] a, byte[] b) {
-        byte[] c = new byte[a.length+b.length];
-        System.arraycopy(a, 0, c, 0, a.length);
-        System.arraycopy(b, 0, c, a.length, b.length);
-        return c;
-    }
-    
-    public static byte[] getFirstBlock(byte[] a) {
-        byte[] c = new byte[16];
-        System.arraycopy(a, 0, c, 0, 16);
-        return c;
     }
     
 }
