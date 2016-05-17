@@ -1,8 +1,8 @@
 package id.ac.itb.informatika.tugasawesome.process;
 
 import id.ac.itb.informatika.tugasawesome.utils.ByteArrayOp;
+import java.math.BigInteger;
 import java.security.MessageDigest;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -25,6 +25,7 @@ public class Mapping {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] wordBytes = new byte[word.length + salt.length];
+            wordBytes = ByteArrayOp.addBytes(word, salt);
             md.update(wordBytes);
             
             hashWord = md.digest();
@@ -41,12 +42,12 @@ public class Mapping {
      * @return 
      */
     public static List<PointByte> wordsToPoint(List<String> listWords) {
-        boolean repeat = false;
         Set<PointByte> setPoint = new HashSet<>();
-        byte[] salt = ByteArrayOp.randomByte(16);
+        byte[] salt = ByteArrayOp.randomByte().toByteArray();
         
         //get all pairwise distict point
         while (setPoint.size() != listWords.size()) { 
+            boolean repeat = false;
             for (String word : listWords) {
                 byte[] hash = Hash(word.getBytes(), salt);
                 PointByte point = new PointByte(hash);
@@ -54,14 +55,11 @@ public class Mapping {
                 if (!setPoint.add(point)) {
                     repeat = true;
                     break;
-                } else {
-                    System.out.println("Add : "); point.print();
-                    System.out.println("Set size : " + setPoint.size()); 
-                }
+                } 
             }
             
             if (repeat) {
-                salt = ByteArrayOp.randomByte(16);
+                salt = ByteArrayOp.randomByte().toByteArray();
                 setPoint.clear();
                 System.out.println("Hash repeated with new salt : " 
                         + ByteArrayOp.toHex(salt));

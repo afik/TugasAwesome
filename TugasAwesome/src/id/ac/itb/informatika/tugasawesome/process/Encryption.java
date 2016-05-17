@@ -1,6 +1,7 @@
 package id.ac.itb.informatika.tugasawesome.process;
 
 import id.ac.itb.informatika.tugasawesome.utils.ByteArrayOp;
+import java.math.BigInteger;
 import java.util.Arrays;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -69,11 +70,13 @@ public class Encryption {
     public static byte[] generateKey() {
         byte[] keyByte = null;
         try {
-            KeyGenerator generator = KeyGenerator.getInstance(ALGORITHM);
-            generator.init(SIZE);
-            SecretKey key = generator.generateKey();
+            do {
+                KeyGenerator generator = KeyGenerator.getInstance(ALGORITHM);
+                generator.init(SIZE);
+                SecretKey key = generator.generateKey();
             
-            keyByte = key.getEncoded();
+                keyByte = key.getEncoded();
+            } while (new BigInteger(1, keyByte).bitLength() >= 128);
         } catch (Exception e) {
             System.err.format("Generate key exception : " + e.getMessage());
         }

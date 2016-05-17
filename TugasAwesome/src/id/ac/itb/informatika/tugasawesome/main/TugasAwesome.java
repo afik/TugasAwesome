@@ -4,14 +4,20 @@ package id.ac.itb.informatika.tugasawesome.main;
 import id.ac.itb.informatika.tugasawesome.process.Encryption;
 import id.ac.itb.informatika.tugasawesome.process.Mapping;
 import id.ac.itb.informatika.tugasawesome.process.PointByte;
+import id.ac.itb.informatika.tugasawesome.process.Shamir;
 import id.ac.itb.informatika.tugasawesome.utils.ByteArrayOp;
 import id.ac.itb.informatika.tugasawesome.utils.FileProcessor;
+import id.ac.itb.informatika.tugasawesome.utils.GfPolynomial;
 import id.ac.itb.informatika.tugasawesome.utils.WordProcessor;
 import java.io.File;
 import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 /**
  *
@@ -41,7 +47,7 @@ public class TugasAwesome {
 //            i++;
 //        }
             
-        /** Tests encrypt and decrypt **/
+        /** Tests encrypt and decrypt - Pass **/
 //        byte[] plainFile = FileProcessor.readFileAsBytes(mainDir + "testFile.txt");
 //        System.out.println(plainFile.length);
 //        System.out.println(Arrays.toString(plainFile));
@@ -60,23 +66,77 @@ public class TugasAwesome {
 //            System.out.println(plain2.length);
 //            System.out.println(Arrays.toString(plain2));
 //        }
-          
             
-        /** Tests Mapping **/
-//        byte[] salt = ByteArrayOp.randomByte(16);
-//        System.out.println(ByteArrayOp.toHex(salt));
+        /** Tests Mapping - Pass**/
+//        BigInteger salt = ByteArrayOp.randomByte();
+//        System.out.println(salt);
 //        String word = "bijective";
-//        byte[] hashWord = Mapping.Hash(word.getBytes(), salt);
+//        byte[] hashWord = Mapping.Hash(word.getBytes(), salt.toByteArray());
 //        System.out.println(ByteArrayOp.toHex(hashWord));
 //        PointByte point = new PointByte(hashWord);
-//        point.print();
-                
-        List<PointByte> listPoint = Mapping.wordsToPoint(dictionaryWord);
+//        point.printHex();
+
+          /*Testing evaluate poly - Pass*/
+//          List<BigInteger> coef = new ArrayList<>();
+//          coef.add(ByteArrayOp.randomByte());
+//          coef.add(ByteArrayOp.randomByte());
+//          coef.add(ByteArrayOp.randomByte());
+//          System.out.println("Coef :" + coef.get(0) + " " + coef.get(1) + " "+ coef.get(2));
+//          BigInteger val = ByteArrayOp.randomByte();
+//          BigInteger prime = ByteArrayOp.randomPrime(val);
+//          BigInteger hasil = Shamir.evaluatePolynomial(coef, val, prime);
+//          System.out.println(hasil);
         
-        //send x-koordinates to secret share
+
+        /*Testing secret share - Pass*/
+        //compute domain
+//        List<BigInteger> xBytes = new ArrayList<>();
+//        List<PointByte> listPoint = Mapping.wordsToPoint(dictionaryWord);
+//        for (PointByte point : listPoint) {
+//            xBytes.add(point.getX());
+//        }
+////        List<BigInteger> xBytes2 = new ArrayList<>();
+////        for (int i = 0; i<100; i++) {
+////            BigInteger randVal = ByteArrayOp.randomByte();
+////            xBytes.add(randVal);
+////        }
+//        
+//        
+//        //generate key
+//        byte[] key = Encryption.generateKey();
+//        BigInteger keyB = new BigInteger(1,key);
+//        System.out.println("Key awal : " + keyB + ", " + keyB.bitLength());
+//        
+//        //generate random prime
+//        BigInteger prime = ByteArrayOp.randomPrime(new BigInteger(1,key));
+//        System.out.println("Prime : " + prime + ", l : " + prime.bitLength());
+//        
+//        //split key
+//        List<PointByte> shares = Shamir.splitKey(key, 5, xBytes, prime);
+//        
+//        
+//        //recover key
+//        List<PointByte> shareToRecover = new ArrayList<>();
+//        Set<Integer> setIdx = new HashSet<>();
+//        while (setIdx.size() < 5) {
+//            Random rand = new Random();
+//            int a;
+//            do {
+//                a = rand.nextInt(xBytes.size());
+//            } while (!setIdx.add(a));
+//            shareToRecover.add(shares.get(a));
+//        }
+//        BigInteger keyRecovered = Shamir.recoverKey(shareToRecover, prime);
+//        System.out.println("Key akhir : " + keyRecovered + " " + keyRecovered.bitLength());
+
         
-        //secret share : choose x0 random, create polinomial so p(x0)=K
-        
+        /*Testing Lagrange interpolation*/
+        BigInteger prime = new BigInteger("2");
+        List<PointByte> points = new ArrayList<>();
+        points.add(new PointByte(BigInteger.ONE, new BigInteger("7")));
+        points.add(new PointByte(new BigInteger("2"), new BigInteger("8")));
+        GfPolynomial poly = GfPolynomial.interpolatePolynomial(points, prime);
+        System.out.println(poly + "\n " +poly.evaluatePolynomial(new BigInteger("5")));
     }
     
 }

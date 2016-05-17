@@ -1,152 +1,77 @@
 package id.ac.itb.informatika.tugasawesome.process;
 
+
 import id.ac.itb.informatika.tugasawesome.utils.ByteArrayOp;
+import id.ac.itb.informatika.tugasawesome.utils.GfPolynomial;
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  *
  * @author Khoirunnisa Afifah <khoirunnisa.afik@gmail.com>
  */
 public final class Shamir {
-    public static SecretShare[] split(final BigInteger secret, int needed, int available, BigInteger prime, Random random)
-    {
-        System.out.println("Prime Number: " + prime);
-
-        final BigInteger[] coeff = new BigInteger[needed];
-        coeff[0] = secret;
-        for (int i = 1; i < needed; i++)
-        {
-            BigInteger r;
-            while (true)
-            {
-                r = new BigInteger(prime.bitLength(), random);
-                if (r.compareTo(BigInteger.ZERO) > 0 && r.compareTo(prime) < 0)
-                {
-                    break;
-                }
-            }
-            coeff[i] = r;
-        }
-
-        final SecretShare[] shares = new SecretShare[available];
-        for (int x = 1; x <= available; x++)
-        {
-            BigInteger accum = secret;
-
-            for (int exp = 1; exp < needed; exp++)
-            {
-                accum = accum.add(coeff[exp].multiply(BigInteger.valueOf(x).pow(exp).mod(prime))).mod(prime);
-            }
-            shares[x - 1] = new SecretShare(x, accum);
-            System.out.println("Share " + shares[x - 1]);
-        }
-
-        return shares;
-    }
-
-    public static BigInteger combine(final SecretShare[] shares, final BigInteger prime)
-    {
-        BigInteger accum = BigInteger.ZERO;
-
-        for(int formula = 0; formula < shares.length; formula++)
-        {
-            BigInteger numerator = BigInteger.ONE;
-            BigInteger denominator = BigInteger.ONE;
-
-            for(int count = 0; count < shares.length; count++)
-            {
-                if(formula == count)
-                    continue; // If not the same value
-
-                int startposition = shares[formula].getNumber();
-                int nextposition = shares[count].getNumber();
-
-                numerator = numerator.multiply(BigInteger.valueOf(nextposition).negate()).mod(prime); // (numerator * -nextposition) % prime;
-                denominator = denominator.multiply(BigInteger.valueOf(startposition - nextposition)).mod(prime); // (denominator * (startposition - nextposition)) % prime;
-            }
-            BigInteger value = shares[formula].getShare();
-            BigInteger tmp = value.multiply(numerator) . multiply(modInverse(denominator, prime));
-            accum = prime.add(accum).add(tmp) . mod(prime); //  (prime + accum + (value * numerator * modInverse(denominator))) % prime;
-        }
-
-        System.out.println("The secret is: " + accum + "\n");
-
-        return accum;
-    }
-
-    private static BigInteger[] gcdD(BigInteger a, BigInteger b)
-    { 
-        if (b.compareTo(BigInteger.ZERO) == 0)
-            return new BigInteger[] {a, BigInteger.ONE, BigInteger.ZERO}; 
-        else
-        { 
-            BigInteger n = a.divide(b);
-            BigInteger c = a.mod(b);
-            BigInteger[] r = gcdD(b, c); 
-            return new BigInteger[] {r[0], r[2], r[1].subtract(r[2].multiply(n))};
-        }
-    }
-
-    private static BigInteger modInverse(BigInteger k, BigInteger prime)
-    { 
-        k = k.mod(prime);
-        BigInteger r = (k.compareTo(BigInteger.ZERO) == -1) ? (gcdD(prime, k.negate())[2]).negate() : gcdD(prime,k)[2];
-        return prime.add(r).mod(prime);
-    }
-
-    public static void main(final String[] args)
-    {
-        final int CERTAINTY = 256;
-        final SecureRandom random = new SecureRandom();
-
-        final BigInteger secret = new BigInteger("123");
-
-        // prime number must be longer then secret number
-        final BigInteger prime = new BigInteger(secret.bitLength() + 1, CERTAINTY, random);
-
-        // 2 - at least 2 secret parts are needed to view secret
-        // 5 - there are 5 persons that get secret parts
-        final SecretShare[] shares = Shamir.split(secret, 2, 5, prime, random);
-
-
-        // we can use any combination of 2 or more parts of secret
-        SecretShare[] sharesToViewSecret = new SecretShare[] {shares[0],shares[1]}; // 0 & 1
-        BigInteger result = Shamir.combine(sharesToViewSecret, prime);
-
-        sharesToViewSecret = new SecretShare[] {shares[1],shares[4]}; // 1 & 4
-        result = Shamir.combine(sharesToViewSecret, prime);
-
-        sharesToViewSecret = new SecretShare[] {shares[0],shares[1],shares[3]}; // 0 & 1 & 3
-        result = Shamir.combine(sharesToViewSecret, prime);
-    }
-    
-    public static PointByte[] splitKey(byte[] key, int threshold, List<byte[]> domain) {
-        
-        
+    public static List<PointByte> splitKey(byte[] key, int threshold, List<BigInteger> domain, BigInteger prime) {
+       List<PointByte> allShare = new ArrayList<>();
+                
        //construct polynomial from key and random coefficint
-       List<byte[]> coeff = new ArrayList<>();
-       coeff.add(key);
+       List<BigInteger> coeff = new ArrayList<>();
+       coeff.add(new BigInteger(1,key));
        for (int i = 0; i < threshold-1; i++) {
-           coeff.add(ByteArrayOp.randomByte(16));
+           coeff.add(randomCoef(new BigInteger(1,key), prime)); //TODO : creaate random coef, coef < secret, coeef < prime
        }
        
+       GfPolynomial poly = new GfPolynomial(coeff, prime);
+       
        //compute shares
-       for (byte[] x : domain) {
-           byte[] y = evaluatePolynomial(coeff, x);
+       for (BigInteger x : domain) {
+           BigInteger y = poly.evaluatePolynomial(x);
+           PointByte point = new PointByte(x,y);
+           allShare.add(point);
        }
-        
-        
-        return null;
+       return allShare;
     }
     
-    public static byte[] evaluatePolynomial(List<byte[]> coeff, byte[] val) {
+    /**
+     * Get value of f(0) from polynomials using Lagrange interpolation
+     * @param shares : list of share as result of words query mapped to PointByte
+     * @return byte[] of possible key
+     */
+    public static BigInteger recoverKey(List<PointByte> shares, BigInteger prime) {
+        BigInteger key = BigInteger.ZERO;
         
-        
-        
-        return null;
+        for (int i = 0; i < shares.size(); ++i) {
+            PointByte share = shares.get(i);
+            BigInteger thisX = share.getX();
+            BigInteger thisY = share.getY();
+            BigInteger numerator = BigInteger.ONE;
+            BigInteger denominator = BigInteger.ONE;
+            for (int j = 0; j < shares.size(); j++) {
+                PointByte otherShare = shares.get(j);
+                if (!share.isEqual(otherShare)) {
+                    BigInteger otherX = otherShare.getX();
+                    numerator = numerator.multiply(otherX.negate()).mod(prime);
+                    denominator = denominator.multiply(thisX.subtract(otherX)).mod(prime);
+                } 
+            }
+            BigInteger delta = thisY.multiply(numerator).multiply(GfPolynomial.modInverse(denominator,prime));
+            key = prime.add(key).add(delta).mod(prime);
+       }
+        return key;
     }
+    
+    /**
+     * Random BigInteger that not bigger/equal to secret and prime number
+     */
+    private static BigInteger randomCoef(BigInteger secret, BigInteger prime) {
+        BigInteger coef;
+        do {
+            coef = ByteArrayOp.randomByte();
+        } while(coef.compareTo(prime) >= 0 ||
+                coef.compareTo(secret) >= 0);
+        return coef;
+    }
+    
+    
 }
