@@ -1,8 +1,9 @@
 package id.ac.itb.informatika.tugasawesome.process;
 
 
+import id.ac.itb.informatika.tugasawesome.model.PointByte;
 import id.ac.itb.informatika.tugasawesome.utils.ByteArrayOp;
-import id.ac.itb.informatika.tugasawesome.utils.GfPolynomial;
+import id.ac.itb.informatika.tugasawesome.model.GfPolynomial;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,26 +40,7 @@ public final class Shamir {
      * @return byte[] of possible key
      */
     public static BigInteger recoverKey(List<PointByte> shares, BigInteger prime) {
-        BigInteger key = BigInteger.ZERO;
-        
-        for (int i = 0; i < shares.size(); ++i) {
-            PointByte share = shares.get(i);
-            BigInteger thisX = share.getX();
-            BigInteger thisY = share.getY();
-            BigInteger numerator = BigInteger.ONE;
-            BigInteger denominator = BigInteger.ONE;
-            for (int j = 0; j < shares.size(); j++) {
-                PointByte otherShare = shares.get(j);
-                if (!share.isEqual(otherShare)) {
-                    BigInteger otherX = otherShare.getX();
-                    numerator = numerator.multiply(otherX.negate()).mod(prime);
-                    denominator = denominator.multiply(thisX.subtract(otherX)).mod(prime);
-                } 
-            }
-            BigInteger delta = thisY.multiply(numerator).multiply(GfPolynomial.modInverse(denominator,prime));
-            key = prime.add(key).add(delta).mod(prime);
-       }
-        return key;
+        return GfPolynomial.interpolateAtZero(shares, prime);
     }
     
     /**

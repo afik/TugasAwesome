@@ -3,11 +3,11 @@ package id.ac.itb.informatika.tugasawesome.main;
 
 import id.ac.itb.informatika.tugasawesome.process.Encryption;
 import id.ac.itb.informatika.tugasawesome.process.Mapping;
-import id.ac.itb.informatika.tugasawesome.process.PointByte;
+import id.ac.itb.informatika.tugasawesome.model.PointByte;
 import id.ac.itb.informatika.tugasawesome.process.Shamir;
 import id.ac.itb.informatika.tugasawesome.utils.ByteArrayOp;
 import id.ac.itb.informatika.tugasawesome.utils.FileProcessor;
-import id.ac.itb.informatika.tugasawesome.utils.GfPolynomial;
+import id.ac.itb.informatika.tugasawesome.model.GfPolynomial;
 import id.ac.itb.informatika.tugasawesome.utils.WordProcessor;
 import java.io.File;
 import java.math.BigInteger;
@@ -32,14 +32,14 @@ public class TugasAwesome {
         String mainDir = "D:\\AFIK\\Project\\T(ugas) A(wesome)\\test\\";
         
         /**Test word processor**/
-        List<String> tes = FileProcessor.readFile(mainDir + "testFile_2.txt");
+//        List<String> tes = FileProcessor.readFile(mainDir + "testFile_2.txt");
 //        System.out.println(tes.size());
 //        for (String a : tes) {
 //            System.out.println(a);
 //        }
 //        
 //        System.out.println("==============================");
-        List<String> dictionaryWord = WordProcessor.getAllWord(tes);
+//        List<String> dictionaryWord = WordProcessor.getAllWord(tes);
 //        System.out.println(dictionaryWord.size());
 //        int i = 0;
 //        for (String a : dictionaryWord) {
@@ -131,12 +131,12 @@ public class TugasAwesome {
 
         
         /*Testing Lagrange interpolation*/
-        BigInteger prime = new BigInteger("2");
+        BigInteger prime = new BigInteger("6");
         List<PointByte> points = new ArrayList<>();
-        points.add(new PointByte(BigInteger.ONE, new BigInteger("7")));
-        points.add(new PointByte(new BigInteger("2"), new BigInteger("8")));
+        points.add(new PointByte(BigInteger.ONE, new BigInteger("12")));
+        points.add(new PointByte(new BigInteger("2"), new BigInteger("13")));
         GfPolynomial poly = GfPolynomial.interpolatePolynomial(points, prime);
-        System.out.println(poly + "\n " +poly.evaluatePolynomial(new BigInteger("5")));
+        System.out.println(poly + "\n " +poly.evaluatePolynomial(new BigInteger("0")));
     }
     
 }

@@ -1,5 +1,6 @@
 package id.ac.itb.informatika.tugasawesome.process;
 
+import id.ac.itb.informatika.tugasawesome.model.PointByte;
 import id.ac.itb.informatika.tugasawesome.utils.ByteArrayOp;
 import java.math.BigInteger;
 import java.security.MessageDigest;
