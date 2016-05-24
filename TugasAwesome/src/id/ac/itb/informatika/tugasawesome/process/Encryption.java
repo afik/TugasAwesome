@@ -19,8 +19,9 @@ public class Encryption {
     private static final String TRANSFORMATION = "AES/CBC/PKCS5Padding";
     private static final int SIZE = 128;
     private static final byte[] PAD = new byte[SIZE/8];
+    private static final String IV = "boomboomboomboom"; //yes i write my IV here, so what?
     
-    public static byte[] encrypt(byte[] plain, byte[] key, String IV) {
+    public static byte[] encrypt(byte[] plain, byte[] key) {
         byte[] encrypted = null;
         try {
             Cipher cipher = Cipher.getInstance(TRANSFORMATION);
@@ -31,12 +32,11 @@ public class Encryption {
             encrypted =  cipher.doFinal(ByteArrayOp.addBytes(PAD, plain));
         } catch (Exception e) {
             System.err.format("Encrypt exception : " + e.getMessage());
-            e.printStackTrace();
         }
         return encrypted;
     }
     
-    public static byte[] decrypt(byte[] encrypted, byte[] key, String IV) {
+    public static byte[] decrypt(byte[] encrypted, byte[] key) {
         byte[] plain = null;
         try {
             Cipher cipher = Cipher.getInstance(TRANSFORMATION);
@@ -47,12 +47,11 @@ public class Encryption {
             plain =  cipher.doFinal(encrypted);
         } catch (Exception e) {
             System.err.format("Decrypt exception : " + e.getMessage());
-            e.printStackTrace();
         }
         return plain;
     }
     
-    public static boolean checkFirstBlock(byte[] firstBlock, byte[] key, String IV) {
+    public static boolean checkFirstBlock(byte[] firstBlock, byte[] key) {
         byte[] plain = null;
         try {
             Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");

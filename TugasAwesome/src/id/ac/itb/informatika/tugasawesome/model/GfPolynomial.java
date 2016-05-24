@@ -77,7 +77,6 @@ public class GfPolynomial {
      ** and only when it is necessary.
      */
     public static GfPolynomial interpolatePolynomial(List<PointByte> points, BigInteger prime) {
-        System.out.println(points);
         int n = points.size();
         BigInteger[] coefficients = new BigInteger[n];
         for (int i = 0; i < n; i++) {
@@ -92,9 +91,7 @@ public class GfPolynomial {
                 c[j] = prime.add((c[j-1].subtract(c[j].multiply(points.get(i).getX()).mod(prime))).mod(prime)).mod(prime);
             }
             c[0] = prime.add(c[0].multiply(points.get(i).getX().negate()).mod(prime)).mod(prime);
-            System.out.println("1:" + c[0]);
             c[i+1] = BigInteger.ONE;
-            System.out.println(Arrays.asList(c));
         }
 
         final BigInteger[] tc = new BigInteger[n];
@@ -117,8 +114,6 @@ public class GfPolynomial {
                 tc[j] = c[j+1].add(tc[j+1].multiply(points.get(i).getX()).mod(prime)).mod(prime);
                 coefficients[j] = coefficients[j].add(t.multiply(tc[j]).mod(prime)).mod(prime);
             }
-            System.out.println(Arrays.asList(t));
-            System.out.println(Arrays.asList(tc));
         }
         
         List<BigInteger> coef = Arrays.asList(coefficients);

@@ -16,3 +16,14 @@ Source\ Code/
 TugasAwesome/build/*
 
 lib/*
+TugasAwesome/build/built-jar.properties
+TugasAwesome/build/classes/id/ac/itb/informatika/tugasawesome/main/TugasAwesome.class
+TugasAwesome/build/classes/id/ac/itb/informatika/tugasawesome/process/Encryption.class
+TugasAwesome/build/classes/id/ac/itb/informatika/tugasawesome/process/Mapping.class
+TugasAwesome/build/classes/id/ac/itb/informatika/tugasawesome/process/SecretShare.class
+TugasAwesome/build/*
+TugasAwesome/build/built-jar.properties
+TugasAwesome/build/classes/id/ac/itb/informatika/tugasawesome/main/TugasAwesome.class
+TugasAwesome/build/classes/id/ac/itb/informatika/tugasawesome/process/Encryption.class
+TugasAwesome/build/classes/id/ac/itb/informatika/tugasawesome/process/Mapping.class
+TugasAwesome/build/classes/id/ac/itb/informatika/tugasawesome/process/SecretShare.class

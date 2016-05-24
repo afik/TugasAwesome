@@ -14,7 +14,7 @@ public class WordProcessor {
     
     /**
      * Return all unique word in file
-     * @param file
+     * @param file is all line in string
      * @return 
      */
     public static List<String> getAllWord(List<String> file) {

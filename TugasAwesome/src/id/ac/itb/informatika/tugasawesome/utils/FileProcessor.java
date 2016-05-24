@@ -18,7 +18,8 @@ import java.util.List;
 public class FileProcessor {
     
     /**
-     * TODO: check file type, do not return as plain string
+     * TODO: do not return as plain string (and yes i forgot what this mean)
+     * Read file specified by {path} per line.
      * @param path
      * @return 
      */
@@ -34,12 +35,15 @@ public class FileProcessor {
             reader.close();
         } catch (IOException e) {
             System.err.format("IO Exception : " + e.getMessage());
-            e.printStackTrace();
         } 
         return retval;
     }
     
-    
+    /**
+     * Read file specified by {path} as byte array
+     * @param path
+     * @return 
+     */
     public static byte[] readFileAsBytes(String path) {
         byte[] fileContent = null;
         File file = new File(path);
@@ -59,7 +63,6 @@ public class FileProcessor {
                 } 
             } catch (Exception e) {
                 System.err.format("Exception : " + e.getMessage());
-                e.printStackTrace();
             }
         }
         return fileContent;
