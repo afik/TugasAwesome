@@ -57,13 +57,12 @@ public class GfPolynomial {
      * return value of {val} from polynomial {coeff}
      */
     public BigInteger evaluatePolynomial(BigInteger val) {
-        int degree = coeff.size();
         BigInteger value = coeff.get(0);
         
         for (int i = 1; i<degree; i++) {
             BigInteger curCoef = coeff.get(i);
-            BigInteger thisVal = curCoef.multiply(val.pow(i).mod(prime)).mod(prime);
-            value = value.add(thisVal).mod(prime);
+            BigInteger thisVal = curCoef.multiply(val.pow(i).mod(getPrime())).mod(getPrime());
+            value = value.add(thisVal).mod(getPrime());
         }
         
         return value;
@@ -200,7 +199,21 @@ public class GfPolynomial {
         return "GfPolynomial{" + 
                 "coeff=" + coeff + 
                 ", degree=" + degree + 
-                ", prime=" + prime + '}';
+                ", prime=" + getPrime() + '}';
+    }
+
+    /**
+     * @return the prime
+     */
+    public BigInteger getPrime() {
+        return prime;
+    }
+
+    /**
+     * @param prime the prime to set
+     */
+    public void setPrime(BigInteger prime) {
+        this.prime = prime;
     }
     
 }

@@ -20,7 +20,7 @@ public final class Shamir {
        List<BigInteger> coeff = new ArrayList<>();
        coeff.add(new BigInteger(1,key));
        for (int i = 0; i < threshold-1; i++) {
-           coeff.add(randomCoef(new BigInteger(1,key), prime)); //TODO : creaate random coef, coef < secret, coeef < prime
+           coeff.add(randomCoef(new BigInteger(1,key), prime)); 
        }
        
        GfPolynomial poly = new GfPolynomial(coeff, prime);
@@ -41,6 +41,10 @@ public final class Shamir {
      */
     public static BigInteger recoverKey(List<PointByte> shares, BigInteger prime) {
         return GfPolynomial.interpolateAtZero(shares, prime);
+//        System.out.println("-- " +shares.get(3));
+//        GfPolynomial gf = GfPolynomial.interpolatePolynomial(shares, prime);
+//        System.out.println("-- " +gf.evaluatePolynomial(shares.get(3).getX()));
+//        return gf.evaluatePolynomial(BigInteger.ZERO);
     }
     
     /**

@@ -20,6 +20,10 @@ public class Mapping {
     // hash result collide, but let's hope we lucky enough
     private static final String dummySalt = "TugasAwesome"; 
     
+    public static int aaa;
+    public static int bbb;
+    public static int ccc;
+    
     /**
      * Return 256 bit hash value of word + salt as byte array
      * @param word
@@ -49,6 +53,9 @@ public class Mapping {
     public static List<PointByte> wordsToPoint(List<String> listWords) {
         Set<PointByte> setPoint = new HashSet<>();
         byte[] salt = dummySalt.getBytes();
+        PointByte p = new PointByte();
+        PointByte pp = new PointByte();
+        PointByte ppp = new PointByte();
         //byte[] salt = ByteArrayOp.randomByte().toByteArray();
         
         //get all pairwise distict point
@@ -57,6 +64,21 @@ public class Mapping {
             for (String word : listWords) {
                 byte[] hash = Hash(word.getBytes(), salt);
                 PointByte point = new PointByte(hash);
+                if ("sollicitudin".equals(word)) {
+                    p.setX(point.getX());
+                    p.setY(point.getY());
+                    System.out.println("Hash sol " + point);
+                }
+                if ("faucibus".equals(word)) {
+                    pp.setX(point.getX());
+                    pp.setY(point.getY());
+                    System.out.println("Hash fa " + point);
+                }
+                if ("non".equals(word)) {
+                    ppp.setX(point.getX());
+                    ppp.setY(point.getY());
+                    System.out.println("Hash non " + point);
+                }
                 
                 if (!setPoint.add(point)) {
                     repeat = true;
@@ -75,7 +97,10 @@ public class Mapping {
                         + ByteArrayOp.toHex(salt));
             }
         }
-        
+        List<PointByte> aa = new ArrayList<>(setPoint);
+        aaa = aa.indexOf(p);
+        bbb = aa.indexOf(pp);
+        ccc = aa.indexOf(ppp);
         return new ArrayList<>(setPoint);
     }
     
@@ -86,7 +111,7 @@ public class Mapping {
      * @return 
      */
     public static GfPolynomial createMappingFunction(List<PointByte> hashResult,
-                                                    List<PointByte> shares) {
+                                                    List<PointByte> shares, BigInteger prime) {
         if (hashResult.size() != shares.size()) {
             throw new IllegalArgumentException("Mapping error : hashResult and shares should be same size");
         }
@@ -94,16 +119,22 @@ public class Mapping {
         List<PointByte> points = new ArrayList<>();
         
         for (int i = 0; i< hashResult.size(); i++) {
+            
             if (!hashResult.get(i).getX().equals(shares.get(i).getX())) {
                 throw new IllegalArgumentException("Mapping Error : All X value in hashResult and shares should equal");
             } 
+            
+//            if (i == Mapping.aaa || i == Mapping.bbb || i == Mapping.ccc) {
+//                System.out.println("i : " + i);
+//                System.out.println("H " + hashResult.get(i));
+//                System.out.println("S " + shares.get(i));
+//            }
             
             BigInteger valY = hashResult.get(i).getY().xor(shares.get(i).getY());
             PointByte a = new PointByte(shares.get(i).getX(), valY);
             points.add(a);
         }
         
-        BigInteger prime = ByteArrayOp.randomPrime(null);
         
         return GfPolynomial.interpolatePolynomial(points, prime);
     }
@@ -117,8 +148,8 @@ public class Mapping {
     public static PointByte getShare(GfPolynomial poly, String word) {
         byte[] hash = Hash(word.getBytes(), dummySalt.getBytes());
         PointByte hashPoint = new PointByte(hash);
-        
-        BigInteger valY = poly.evaluatePolynomial(hashPoint.getX());
+//        System.out.println("hash " + word + " " +hashPoint);
+        BigInteger valY = poly.evaluatePolynomial(hashPoint.getX()).xor(hashPoint.getY());
         return new PointByte(hashPoint.getX(), valY);
     }
 
