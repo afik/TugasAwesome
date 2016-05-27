@@ -27,7 +27,7 @@ public class GfPolynomial {
         coeff = new ArrayList<>();
         for (BigInteger in : init) {
             coeff.add(in);
-        }   
+        }
     }
     
     /**
@@ -56,15 +56,11 @@ public class GfPolynomial {
     /**
      * return value of {val} from polynomial {coeff}
      */
-    public BigInteger evaluatePolynomial(BigInteger val) {
-        BigInteger value = coeff.get(0);
-        
-        for (int i = 1; i<degree; i++) {
-            BigInteger curCoef = coeff.get(i);
-            BigInteger thisVal = curCoef.multiply(val.pow(i).mod(getPrime())).mod(getPrime());
-            value = value.add(thisVal).mod(getPrime());
+    public BigInteger evaluatePolynomial(BigInteger x) {
+        BigInteger value = BigInteger.ZERO;
+        for (int i = degree; i >= 0; --i) {
+            value = value.multiply(x).add(coeff.get(i)).mod(getPrime());
         }
-        
         return value;
     }
     
