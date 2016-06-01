@@ -26,22 +26,20 @@ import java.util.Set;
 public class FileProcessor {
     
     /**
-     * Read file specified by {path} and return unique words.
+     * Read file specified by {path} and return all unique words.
      * @param path
      * @return 
      */
     public static List<String> readFile(String path) {
         Scanner s = null;
-        Set<String> retval = new HashSet<>();
+        Set<String> setVal = new HashSet<>();
         
         try {
             s = new Scanner(new BufferedReader(new FileReader(path)));
             s.useDelimiter("[\\W]");
             s.useLocale(Locale.US);
             while (s.hasNext()) {
-//                if (s.next().matches("\\w")) {
-                    retval.add(s.next().toLowerCase());
-//                }
+                setVal.add(s.next().toLowerCase());
             }
         } catch (Exception ex) {
             System.err.println("IO Exception : " + ex.getMessage());
@@ -50,21 +48,11 @@ public class FileProcessor {
                 s.close();
             }
         }
-        return new ArrayList<>(retval);
+        
+        List<String> result = new ArrayList<>(setVal);
+        result.remove(0);
+        return result;
                 
-//        List<String> retval = new ArrayList<>();
-//        Path file = FileSystems.getDefault().getPath(path);
-//        Charset charset = Charset.forName("UTF-8"); //Need to be reviewed
-//        try(BufferedReader reader = Files.newBufferedReader(file, charset)) {
-//            String line = null;
-//            while((line = reader.readLine()) != null) {
-//                retval.add(line);
-//            }
-//            reader.close();
-//        } catch (IOException e) {
-//            System.err.format("IO Exception : " + e.getMessage());
-//        } 
-//        return retval;
     }
     
     /**

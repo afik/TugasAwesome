@@ -5,7 +5,8 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * Class represent point of GF(2^128)
+ * Class represent point of GF(2^128) -> integer mod p, where p.bitLength() <= 128
+ * value of x and y cannot bigger than p if {mod} == true
  * @author Khoirunnisa Afifah <khoirunnisa.afik@gmail.com>
  */
 public class PointByte {
@@ -17,52 +18,74 @@ public class PointByte {
     
     private BigInteger x; //first element of point
     private BigInteger y; //second element of point
+    private BigInteger prime; //prime 
+    private boolean mod; //flag indicate if x & y should be mod prime; 
+                         //set to true only if you sure bit length of x & y < 128
     
-    public PointByte() {
+    public PointByte(BigInteger p, boolean mod) {
         x = BigInteger.ZERO;
         y = BigInteger.ZERO;
+        this.mod = mod;
+        prime = p;
     }
     
-    public PointByte(BigInteger a, BigInteger b) {
-        if (isValidElement(a) && isValidElement(b)) {
+    public PointByte(BigInteger a, BigInteger b, BigInteger p, boolean mod) {
+        
+        this.prime = p;
+        this.mod = mod;
+        
+        if (mod) {
+            if (a.compareTo(a.mod(p)) > 0) System.out.println("x berubah");
+            if (b.compareTo(b.mod(p)) > 0) System.out.println("y berubah");
+        
+            this.x = a.mod(p);
+            this.y = b.mod(p);
+        } else {
             this.x = a;
             this.y = b;
-        } else {
-            System.err.println("Error creating point : " + a.bitLength() + " , " + b.bitLength());
         }
         
     }
     
-    public PointByte(byte[] a, byte[] b) {
-        if (isValidElement(new BigInteger(1,a)) && 
-            isValidElement(new BigInteger(1,b))) {
-            byte[] xB = new byte[16];
-            byte[] yB = new byte[16];
-            System.arraycopy(a, 0, xB, SIZE-a.length, a.length);
-            System.arraycopy(b, 0, yB, SIZE-b.length, b.length);
+    public PointByte(byte[] a, byte[] b, BigInteger p, boolean mod) {
+        byte[] xB = new byte[16];
+        byte[] yB = new byte[16];
+        System.arraycopy(a, 0, xB, SIZE-a.length, a.length);
+        System.arraycopy(b, 0, yB, SIZE-b.length, b.length);
+        
+        prime = p;
+        this.mod = mod;
+        
+        if (mod) {
+            x = new BigInteger(1,xB).mod(p);
+            y = new BigInteger(1,yB).mod(p);
+        } else {
             x = new BigInteger(1,xB);
             y = new BigInteger(1,yB);
-        } else {
-            System.err.println("Error creating point : " + new BigInteger(1,a).bitLength() + " , " + new BigInteger(1,b).bitLength());
         }
+        
     }
     
-    public PointByte(byte[] val) {
-//        System.out.println("val : "+ ByteArrayOp.toHex(val));
-        
+    public PointByte(byte[] val, BigInteger p, boolean mod) {        
         byte[] xB = Arrays.copyOfRange(val, 0, SIZE);
         byte[] yB = Arrays.copyOfRange(val, SIZE, val.length);
-//        System.out.println("xB : " + ByteArrayOp.toHex(xB));
-//        System.out.println("yB : " + ByteArrayOp.toHex(yB));
-        BigInteger xxB = new BigInteger(1,xB);
-        BigInteger yyB = new BigInteger(1,yB);
-        if (isValidElement(xxB) && isValidElement(yyB)) {
-            x = xxB;
-            y = yyB;
-//            this.printHex();
+        
+        BigInteger a = new BigInteger(1,xB);
+        BigInteger b = new BigInteger(1,yB);
+        
+        prime = p;
+        this.mod = mod;
+        
+        if (mod) {
+            if (a.compareTo(a.mod(p)) > 0) System.out.println("x berubah");
+            if (b.compareTo(b.mod(p)) > 0) System.out.println("y berubah");
+            x = a.mod(p);
+            y = b.mod(p);
         } else {
-            System.err.println("Error creating point : " + val.length);
+            x = a;
+            y = b;
         }
+        
     }
 
     /**
@@ -76,10 +99,10 @@ public class PointByte {
      * @param x the x to set
      */
     public void setX(BigInteger x) {
-        if (isValidElement(x)) {
-            this.x = x;
+        if (mod) {
+            this.x = x.mod(prime);
         } else {
-            System.err.println("Error set : " + x.bitLength());
+            this.x = x;
         }
     }
 
@@ -94,11 +117,28 @@ public class PointByte {
      * @param y the y to set
      */
     public void setY(BigInteger y) {
-        if (isValidElement(y)) {
-            this.y = y;
+        if (mod) {
+            this.y = y.mod(prime);
         } else {
-            System.err.println("Error set : " + y.bitLength());
+            this.y = y;
         }
+    }
+    
+    
+    public BigInteger getPrime() {
+        return prime;
+    }
+
+    public void setPrime(BigInteger prime) {
+        this.prime = prime;
+    }
+    
+    public boolean isMod() {
+        return mod;
+    }
+
+    public void setMod(boolean mod) {
+        this.mod = mod;
     }
     
     /**

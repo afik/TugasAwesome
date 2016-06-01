@@ -1,6 +1,6 @@
 package id.ac.itb.informatika.tugasawesome.process;
 
-import id.ac.itb.informatika.tugasawesome.utils.ByteArrayOp;
+import id.ac.itb.informatika.tugasawesome.utils.Operations;
 import java.math.BigInteger;
 import java.util.Arrays;
 import javax.crypto.Cipher;
@@ -29,7 +29,7 @@ public class Encryption {
             IvParameterSpec ivSpec = new IvParameterSpec(IV.getBytes("UTF-8"));
             cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
             
-            encrypted =  cipher.doFinal(ByteArrayOp.addBytes(PAD, plain));
+            encrypted =  cipher.doFinal(Operations.addBytes(PAD, plain));
         } catch (Exception e) {
             System.err.format("Encrypt exception : " + e.getMessage());
         }

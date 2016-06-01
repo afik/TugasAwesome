@@ -5,7 +5,7 @@ import id.ac.itb.informatika.tugasawesome.process.Encryption;
 import id.ac.itb.informatika.tugasawesome.process.Mapping;
 import id.ac.itb.informatika.tugasawesome.model.PointByte;
 import id.ac.itb.informatika.tugasawesome.process.Shamir;
-import id.ac.itb.informatika.tugasawesome.utils.ByteArrayOp;
+import id.ac.itb.informatika.tugasawesome.utils.Operations;
 import id.ac.itb.informatika.tugasawesome.utils.FileProcessor;
 import id.ac.itb.informatika.tugasawesome.model.GfPolynomial;
 import id.ac.itb.informatika.tugasawesome.process.Extraction;
@@ -31,15 +31,16 @@ public class TugasAwesome {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        String mainDir = "D:\\AFIK\\Project\\T(ugas) A(wesome)\\test\\";
+//        String mainDir = "D:\\AFIK\\Project\\T(ugas) A(wesome)\\test\\";
+        String mainDir = "../test/";
         
         /**Test word processor**/
-//        List<String> tes = FileProcessor.readFile(mainDir + "testFile_2.txt");
+//        List<String> tes = FileProcessor.readFile(mainDir + "testFile_3.txt");
 //        System.out.println(tes.size());
 //        for (String a : tes) {
 //            System.out.println(a);
 //        }
-////        
+//        
 //        System.out.println("==============================");
 //        List<String> dictionaryWord = WordProcessor.getAllWord(tes);
 //        System.out.println(dictionaryWord.size());
@@ -50,7 +51,7 @@ public class TugasAwesome {
 //        }
             
         /** Tests encrypt and decrypt - Pass **/
-//        byte[] plainFile = FileProcessor.readFileAsBytes(mainDir + "testFile.txt");
+//        byte[] plainFile = FileProcessor.readFileAsBytes(mainDir + "testFile_2.txt");
 //        System.out.println(plainFile.length);
 //        System.out.println(Arrays.toString(plainFile));
 //        System.out.println("=========key===============");
@@ -62,7 +63,7 @@ public class TugasAwesome {
 //        System.out.println(cipher.length);
 //        System.out.println(Arrays.toString(cipher));
 //        System.out.println("===========decrypt=============");
-//        if (Encryption.checkFirstBlock(ByteArrayOp.getFirstBlock(cipher, 16), key)) {
+//        if (Encryption.checkFirstBlock(Operations.getFirstBlock(cipher, 16), key)) {
 //            byte[] decrypted = Encryption.decrypt(cipher, key);
 //            FileProcessor.saveToFile(decrypted, mainDir+"dec.txt");
 //            byte[] dec = FileProcessor.readFileAsBytes(mainDir+"dec.txt");
@@ -72,30 +73,30 @@ public class TugasAwesome {
 //        }
             
         /** Tests Mapping - Pass**/
-//        BigInteger salt = ByteArrayOp.randomByte();
+//        BigInteger prime = Operations.randomPrime(null);
+//        BigInteger salt = Operations.randomByte();
 //        System.out.println(salt);
 //        String word = "bijective";
 //        byte[] hashWord = Mapping.Hash(word.getBytes(), salt.toByteArray());
-//        System.out.println(ByteArrayOp.toHex(hashWord));
-//        PointByte point = new PointByte(hashWord);
+//        System.out.println(Operations.toHex(hashWord));
+//        PointByte point = new PointByte(hashWord, prime);
 //        point.printHex();
 
-          /*Testing evaluate poly - Pass*/
-//          List<BigInteger> coef = new ArrayList<>();
-//          coef.add(ByteArrayOp.randomByte());
-//          coef.add(ByteArrayOp.randomByte());
-//          coef.add(ByteArrayOp.randomByte());
-//          System.out.println("Coef :" + coef.get(0) + " " + coef.get(1) + " "+ coef.get(2));
-//          BigInteger val = ByteArrayOp.randomByte();
-//          BigInteger prime = ByteArrayOp.randomPrime(val);
-//          BigInteger hasil = Shamir.evaluatePolynomial(coef, val, prime);
-//          System.out.println(hasil);
-        
 
         /*Testing secret share - Pass*/
-        //compute domain
+//        //generate key
+//        byte[] key = Encryption.generateKey();
+//        BigInteger keyB = new BigInteger(1,key);
+//        System.out.println("Key awal : " + keyB + ", " + keyB.bitLength());
+//        
+//        //generate random prime
+//        BigInteger prime = Operations.randomPrime(new BigInteger(1,key));
+//        System.out.println("Prime : " + prime + ", l : " + prime.bitLength());
+//        
+//        
+//        //compute domain
 //        List<BigInteger> xBytes = new ArrayList<>();
-//        List<PointByte> listPoint = Mapping.wordsToPoint(dictionaryWord);
+//        List<PointByte> listPoint = Mapping.wordsToPoint(dictionaryWord, prime);
 //        for (PointByte point : listPoint) {
 //            xBytes.add(point.getX());
 //        }
@@ -105,15 +106,6 @@ public class TugasAwesome {
 ////            xBytes.add(randVal);
 ////        }
 //        
-//        
-//        //generate key
-//        byte[] key = Encryption.generateKey();
-//        BigInteger keyB = new BigInteger(1,key);
-//        System.out.println("Key awal : " + keyB + ", " + keyB.bitLength());
-//        
-//        //generate random prime
-//        BigInteger prime = ByteArrayOp.randomPrime(new BigInteger(1,key));
-//        System.out.println("Prime : " + prime + ", l : " + prime.bitLength());
 //        
 //        //split key
 //        List<PointByte> shares = Shamir.splitKey(key, 5, xBytes, prime);
@@ -135,51 +127,54 @@ public class TugasAwesome {
 
         
         /*Testing Lagrange interpolation - Pass*/
-        BigInteger prime = ByteArrayOp.randomPrime(null);
-        List<PointByte> points = new ArrayList<>();
-        BigInteger x1 = ByteArrayOp.randomByte();
-        BigInteger x2 = ByteArrayOp.randomByte();
-        BigInteger x3 = ByteArrayOp.randomByte();
-        BigInteger y1 = ByteArrayOp.randomByte();
-        BigInteger y2 = ByteArrayOp.randomByte();
-        BigInteger y3 = ByteArrayOp.randomByte();
-        PointByte p1 = new PointByte(x1,y1);
-        PointByte p2 = new PointByte(x2,y2);
-        PointByte p3 = new PointByte(x3,y3);
-        System.out.println(p1);
-        System.out.println(p2);
-        System.out.println(p3);
-        points.add(p1);
-        points.add(p2);
-        points.add(p3);
-        GfPolynomial poly = GfPolynomial.interpolatePolynomial(points, prime);
-        System.out.println(poly.evaluatePolynomial(x1));
-        System.out.println(poly.evaluatePolynomial(x2));
-        System.out.println(poly.evaluatePolynomial(x3));
+//        List<PointByte> points = new ArrayList<>();
+//        BigInteger prime = Operations.randomPrime(null);
+//        BigInteger x1 = Operations.randomByte();
+//        BigInteger x2 = Operations.randomByte();
+//        BigInteger x3 = Operations.randomByte();
+//        BigInteger y1 = Operations.randomByte();
+//        BigInteger y2 = Operations.randomByte();
+//        BigInteger y3 = Operations.randomByte();
+//        PointByte p1 = new PointByte(x1,y1, prime);
+//        PointByte p2 = new PointByte(x2,y2, prime);
+//        PointByte p3 = new PointByte(x3,y3, prime);
+//        System.out.println(p1);
+//        System.out.println(p2);
+//        System.out.println(p3);
+//        points.add(p1);
+//        points.add(p2);
+//        points.add(p3);
+//        
+//        GfPolynomial poly = GfPolynomial.interpolatePolynomial(points, prime);
+//        System.out.println(poly.evaluatePolynomial(x1));
+//        System.out.println(poly.evaluatePolynomial(x2));
+//        System.out.println(poly.evaluatePolynomial(x3));
+        
+        
 
         /*Protect Mechanism*/
-//        String file = mainDir + "testFile_2.txt";
-//        //P.1 Encrypt message
-//        byte[] filePlain = FileProcessor.readFileAsBytes(file);
-//        byte[] key = Encryption.generateKey();
-//        System.out.println("Key " + new BigInteger(1,key));
-//        byte[] cipher = Encryption.encrypt(filePlain, key);
-//        FileProcessor.saveToFile(cipher, mainDir+"cipher_2.txt");
-//        
-//        //P.2 and P.3
-//        int threshold = 3;
-//        GfPolynomial poly = Protection.protect(file, key, threshold);
-//        System.out.println(poly);
-//        System.out.println("Share retreive from poly : ");
-//        System.out.println(Mapping.getShare(poly, "sollicitudin"));
-//        System.out.println(Mapping.getShare(poly, "faucibus"));
-//        System.out.println(Mapping.getShare(poly, "non"));
-//        
-//        /*Extraction Mechanism*/
-//        List<String> guess = Arrays.asList("sollicitudin", "faucibus", "non");
-//        byte[] fileCipher = FileProcessor.readFileAsBytes(mainDir+"cipher_2.txt");
-//        String plain = Extraction.extract(fileCipher, poly, guess);
-//        System.out.println(plain);
+        String file = mainDir + "testFile.txt";
+        
+        //P.1 Encrypt message
+        byte[] filePlain = FileProcessor.readFileAsBytes(file);
+        byte[] key = Encryption.generateKey();
+        System.out.println("Key " + new BigInteger(1,key) + " : " + new BigInteger(1,key).bitLength());
+        byte[] cipher = Encryption.encrypt(filePlain, key);
+        FileProcessor.saveToFile(cipher, mainDir+"cipher_2.txt");
+        
+        //P.2 and P.3
+        int threshold = 3;
+        GfPolynomial poly = Protection.protect(file, key, threshold);
+        
+        /*Extraction Mechanism*/
+        List<String> guess = Arrays.asList("level", "Mobile", "package", "class", "JAVA");
+//        List<String> guess = Arrays.asList("vitae", "FINIbus", "integer", "ipsum", "Lorem");
+//        List<String> guess = Arrays.asList("vitae", "FINIbus", "notice", "xanadu", "scanner");
+        byte[] fileCipher = FileProcessor.readFileAsBytes(mainDir+"cipher_2.txt");
+        String plain = Extraction.extract(fileCipher, poly, guess);
+        System.out.println(plain);
+        
+        
     }
     
 }

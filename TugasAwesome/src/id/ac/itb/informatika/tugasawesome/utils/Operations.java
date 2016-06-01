@@ -1,14 +1,16 @@
 package id.ac.itb.informatika.tugasawesome.utils;
 
+import id.ac.itb.informatika.tugasawesome.model.PointByte;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.List;
 import javax.xml.bind.DatatypeConverter;
 
 /**
  *
  * @author Khoirunnisa Afifah <khoirunnisa.afik@gmail.com>
  */
-public class ByteArrayOp {
+public class Operations {
     
     public static SecureRandom RANDOM = new SecureRandom();
     public static final int SIZE = 16;
@@ -51,18 +53,46 @@ public class ByteArrayOp {
     }
     
     /**
-     * Generate random prime number in byte with size <= {size}
+     * Generate random prime number with 0 <= bitLength <= 128
+     * and bigger than secret if secret not null
      */
     public static BigInteger randomPrime(BigInteger secret) {
-        BigInteger prime;
-        if (secret == null ) {
-            prime = BigInteger.probablePrime(BITLENGTH, RANDOM);
-        } else {
+        BigInteger prime; 
+
+        if (secret != null) {
             do {
                 prime = BigInteger.probablePrime(BITLENGTH, RANDOM);
             } while (prime.compareTo(secret) <= 0);
+        } else {
+            prime = BigInteger.probablePrime(BITLENGTH, RANDOM);
         }
+        
         return prime;
+        
+//        BigInteger prime;
+//        boolean pass = true;
+//        
+//        do {
+//            pass= true;
+//            prime = BigInteger.probablePrime(BITLENGTH, RANDOM);
+//            if (secret != null) {
+//                if (prime.compareTo(secret) <= 0) {
+//                    System.out.println("prime lebih kecil dari secret");
+//                    pass = false;
+//                }
+//            } 
+//            
+//            for (PointByte p : participant) {
+//                if (p.getX().compareTo(prime) >= 0 || p.getY().compareTo(prime) >= 0) {
+//                    System.out.println("ada participant yg lebih gedhe");
+//                    pass = false;
+//                    break;
+//                }
+//            }
+//            
+//        } while(!pass);
+//        
+//        return prime;
     }
     
 }

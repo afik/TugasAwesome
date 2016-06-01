@@ -2,7 +2,7 @@ package id.ac.itb.informatika.tugasawesome.process;
 
 
 import id.ac.itb.informatika.tugasawesome.model.PointByte;
-import id.ac.itb.informatika.tugasawesome.utils.ByteArrayOp;
+import id.ac.itb.informatika.tugasawesome.utils.Operations;
 import id.ac.itb.informatika.tugasawesome.model.GfPolynomial;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -14,7 +14,9 @@ import java.util.List;
  */
 public final class Shamir {
     public static List<PointByte> splitKey(byte[] key, int threshold, List<BigInteger> domain, BigInteger prime) {
-       List<PointByte> allShare = new ArrayList<>();
+       System.out.println("spit...");
+        
+        List<PointByte> allShare = new ArrayList<>();
                 
        //construct polynomial from key and random coefficint
        List<BigInteger> coeff = new ArrayList<>();
@@ -28,9 +30,11 @@ public final class Shamir {
        //compute shares
        for (BigInteger x : domain) {
            BigInteger y = poly.evaluatePolynomial(x);
-           PointByte point = new PointByte(x,y);
+           if (y.compareTo(prime) > 0) System.out.println("y split lebih besar");
+           PointByte point = new PointByte(x,y,prime, true);
            allShare.add(point);
        }
+       System.out.println("end of spit...");
        return allShare;
     }
     
@@ -39,11 +43,12 @@ public final class Shamir {
      * @param shares : list of share as result of words query mapped to PointByte
      * @return byte[] of possible key
      */
-    public static BigInteger recoverKey(List<PointByte> shares, BigInteger prime) {
+    public static BigInteger recoverKey(List<PointByte> shares, BigInteger prime) {        
+        List<PointByte> modShares = new ArrayList<>();
+        
         return GfPolynomial.interpolateAtZero(shares, prime);
-//        System.out.println("-- " +shares.get(3));
-//        GfPolynomial gf = GfPolynomial.interpolatePolynomial(shares, prime);
-//        System.out.println("-- " +gf.evaluatePolynomial(shares.get(3).getX()));
+
+//        GfPolynomial gf = GfPolynomial.interpolatePolynomial(modShares, prime);
 //        return gf.evaluatePolynomial(BigInteger.ZERO);
     }
     
@@ -53,7 +58,7 @@ public final class Shamir {
     private static BigInteger randomCoef(BigInteger secret, BigInteger prime) {
         BigInteger coef;
         do {
-            coef = ByteArrayOp.randomByte();
+            coef = Operations.randomByte();
         } while(coef.compareTo(prime) >= 0 ||
                 coef.compareTo(secret) >= 0);
         return coef;

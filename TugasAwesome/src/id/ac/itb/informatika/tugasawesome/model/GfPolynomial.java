@@ -1,6 +1,6 @@
 package id.ac.itb.informatika.tugasawesome.model;
 
-import id.ac.itb.informatika.tugasawesome.utils.ByteArrayOp;
+import id.ac.itb.informatika.tugasawesome.utils.Operations;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,7 +48,7 @@ public class GfPolynomial {
     private BigInteger randomCoeff(BigInteger prime) {
         BigInteger coef;
         do {
-            coef = ByteArrayOp.randomByte();
+            coef = Operations.randomByte();
         } while(coef.compareTo(prime) >= 0);
         return coef;
     }
