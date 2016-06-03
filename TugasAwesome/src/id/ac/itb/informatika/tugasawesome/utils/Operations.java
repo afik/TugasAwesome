@@ -57,18 +57,17 @@ public class Operations {
      * and bigger than secret if secret not null
      */
     public static BigInteger randomPrime(BigInteger secret) {
-        BigInteger prime; 
-
-        if (secret != null) {
-            do {
-                prime = BigInteger.probablePrime(BITLENGTH, RANDOM);
-            } while (prime.compareTo(secret) <= 0);
-        } else {
-            prime = BigInteger.probablePrime(BITLENGTH, RANDOM);
-        }
+//        BigInteger prime; 
+//
+//        if (secret != null) {
+//            prime = secret.nextProbablePrime();
+//        } else {
+//            prime = BigInteger.probablePrime(BITLENGTH, RANDOM);
+//        }
+//        
+//        return prime;
         
-        return prime;
-        
+        return BigInteger.probablePrime(BITLENGTH+1, RANDOM);
 //        BigInteger prime;
 //        boolean pass = true;
 //        

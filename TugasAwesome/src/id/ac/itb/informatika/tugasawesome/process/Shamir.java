@@ -14,7 +14,7 @@ import java.util.List;
  */
 public final class Shamir {
     public static List<PointByte> splitKey(byte[] key, int threshold, List<BigInteger> domain, BigInteger prime) {
-       System.out.println("spit...");
+       System.out.println("split...");
         
         List<PointByte> allShare = new ArrayList<>();
                 
@@ -31,10 +31,10 @@ public final class Shamir {
        for (BigInteger x : domain) {
            BigInteger y = poly.evaluatePolynomial(x);
            if (y.compareTo(prime) > 0) System.out.println("y split lebih besar");
-           PointByte point = new PointByte(x,y,prime, true);
+           PointByte point = new PointByte(x,y,prime, false);
            allShare.add(point);
        }
-       System.out.println("end of spit...");
+       System.out.println("end of split...");
        return allShare;
     }
     

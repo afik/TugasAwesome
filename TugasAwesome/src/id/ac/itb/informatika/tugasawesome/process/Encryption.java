@@ -19,7 +19,7 @@ public class Encryption {
     private static final String TRANSFORMATION = "AES/CBC/PKCS5Padding";
     private static final int SIZE = 128;
     private static final byte[] PAD = new byte[SIZE/8];
-    private static final String IV = "boomboomboomboom"; //yes i write my IV here, so what?
+    private static final String IV = "boomboomboomboom"; 
     
     public static byte[] encrypt(byte[] plain, byte[] key) {
         byte[] encrypted = null;

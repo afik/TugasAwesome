@@ -56,7 +56,9 @@ public class Mapping {
             boolean repeat = false;
             for (String word : listWords) {
                 byte[] hash = Hash(word.getBytes(), salt);
-                PointByte point = new PointByte(hash, prime, true);
+                PointByte point = new PointByte(hash, prime, false);
+                
+                System.out.println(point.getX().bitLength() + " " + point.getX().bitLength());
                 
                 if (!setPoint.add(point)) {
                     repeat = true;
@@ -104,6 +106,9 @@ public class Mapping {
             
             
             BigInteger valY = hashResult.get(i).getY().xor(shares.get(i).getY());
+            if (valY.bitLength() == prime.bitLength()) {
+                System.out.println("hasil xor length sama kaya prime");
+            }
             PointByte a = new PointByte(shares.get(i).getX(), valY, prime, false);
             points.add(a);
         }
@@ -121,8 +126,14 @@ public class Mapping {
      */
     public static PointByte getShare(GfPolynomial poly, String word, BigInteger prime) {
         byte[] hash = Hash(word.getBytes(), dummySalt.getBytes());
-        PointByte hashPoint = new PointByte(hash, prime, true);
+        PointByte hashPoint = new PointByte(hash, prime, false);
         BigInteger valY = poly.evaluatePolynomial(hashPoint.getX()).xor(hashPoint.getY());
+        if (valY.bitLength() == prime.bitLength()) {
+                valY =  valY.mod(new BigInteger("2").pow(128));
+            }
+        if (valY.bitLength() == prime.bitLength()) {
+            System.out.println("hasil xor 2 sama panjang");
+        }
         return new PointByte(hashPoint.getX(), valY, prime, false);
     }
 

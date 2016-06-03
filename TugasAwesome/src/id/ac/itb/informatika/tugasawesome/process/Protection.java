@@ -34,12 +34,23 @@ public class Protection {
         List<PointByte> hashResult = Mapping.wordsToPoint(words, prime);
         for (PointByte point : hashResult) {
             xBytes.add(point.getX());
-            if (point.getX().compareTo(prime) >= 0) {
-                System.out.println("x lebih besar");
-            }
+//            if (point.getX().compareTo(prime) >= 0) {
+//                System.out.println("x hash lebih besar");
+//            } 
+//            
+//            if (point.getY().compareTo(prime) >= 0) {
+//                System.out.println("y hash lebih besar");
+//            }
         }
         
         List<PointByte> shares = Shamir.splitKey(key, threshold, xBytes, prime);
+        
+        for (PointByte point : shares) {
+            if (point.getY().bitLength() == prime.bitLength()) {
+                point.setY(point.getY().mod(new BigInteger("2").pow(128)));
+            }
+            System.out.println(point.getX().bitLength() + " " + point.getY().bitLength());
+        }
         
         //P.3 connect keyword to share
         GfPolynomial mappingFunction = Mapping.createMappingFunction(hashResult, shares, prime);
