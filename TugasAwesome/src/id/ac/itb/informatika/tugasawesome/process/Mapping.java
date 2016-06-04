@@ -18,7 +18,7 @@ public class Mapping {
     
     // actually this salt should be change in mapWordsToPoint funtion if 
     // hash result collide, but let's hope we lucky enough
-    private static final String dummySalt = "TugasAwesome"; 
+    private static final String DUMMYSALT = "TugasAwesome"; 
     
     /**
      * Return 256 bit hash value of word + salt as byte array
@@ -30,8 +30,7 @@ public class Mapping {
         byte[] hashWord = null;
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] wordBytes = new byte[word.length + salt.length];
-            wordBytes = Operations.addBytes(word, salt);
+            byte[] wordBytes = Operations.addBytes(word, salt);
             md.update(wordBytes);
             
             hashWord = md.digest();
@@ -49,7 +48,7 @@ public class Mapping {
     public static List<PointByte> wordsToPoint(List<String> listWords, BigInteger prime) {
         System.out.println("map words to point...");
         Set<PointByte> setPoint = new HashSet<>();
-        byte[] salt = dummySalt.getBytes();
+        byte[] salt = DUMMYSALT.getBytes();
         
         //get all pairwise distict point
         while (setPoint.size() != listWords.size()) { 
@@ -58,7 +57,6 @@ public class Mapping {
                 byte[] hash = Hash(word.getBytes(), salt);
                 PointByte point = new PointByte(hash, prime, false);
                 
-                System.out.println(point.getX().bitLength() + " " + point.getX().bitLength());
                 
                 if (!setPoint.add(point)) {
                     repeat = true;
@@ -66,17 +64,17 @@ public class Mapping {
                 } 
             }
             
-            
             if (repeat) {
                 //let's hope we'll never reach here
                 //salt = ByteArrayOp.randomByte().toByteArray();
                 
-                salt = dummySalt.getBytes();
+                salt = DUMMYSALT.getBytes();
                 setPoint.clear();
                 System.out.println("Hash repeated with new salt : " 
                         + Operations.toHex(salt));
             }
         }
+        
         System.out.println("end of map words to point...");
         return new ArrayList<>(setPoint);
     }
@@ -106,9 +104,6 @@ public class Mapping {
             
             
             BigInteger valY = hashResult.get(i).getY().xor(shares.get(i).getY());
-            if (valY.bitLength() == prime.bitLength()) {
-                System.out.println("hasil xor length sama kaya prime");
-            }
             PointByte a = new PointByte(shares.get(i).getX(), valY, prime, false);
             points.add(a);
         }
@@ -125,15 +120,9 @@ public class Mapping {
      * @return 
      */
     public static PointByte getShare(GfPolynomial poly, String word, BigInteger prime) {
-        byte[] hash = Hash(word.getBytes(), dummySalt.getBytes());
+        byte[] hash = Hash(word.getBytes(), DUMMYSALT.getBytes());
         PointByte hashPoint = new PointByte(hash, prime, false);
         BigInteger valY = poly.evaluatePolynomial(hashPoint.getX()).xor(hashPoint.getY());
-        if (valY.bitLength() == prime.bitLength()) {
-                valY =  valY.mod(new BigInteger("2").pow(128));
-            }
-        if (valY.bitLength() == prime.bitLength()) {
-            System.out.println("hasil xor 2 sama panjang");
-        }
         return new PointByte(hashPoint.getX(), valY, prime, false);
     }
 

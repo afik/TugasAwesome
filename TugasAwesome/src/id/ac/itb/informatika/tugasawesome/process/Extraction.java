@@ -24,12 +24,12 @@ public class Extraction {
         }
         
         //E.2 Compute key
-        BigInteger key = Shamir.recoverKey(allShare, poly.getPrime());
+        BigInteger key =  Shamir.recoverKey(allShare, poly.getPrime());
         
-        if (key.bitLength() >= 128) {
-            key = key.mod(new BigInteger("2").pow(128));
-//            System.err.format("Key recovered > 128");
-//            return null;
+        //valid key length is <= 127 
+        if (key.bitLength() > 127) {
+            System.err.format("Key recovered > 128");
+            return null;
         }
         
         System.out.println("Key recovered: " + key);

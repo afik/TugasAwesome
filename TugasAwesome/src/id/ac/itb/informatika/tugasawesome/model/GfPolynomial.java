@@ -66,6 +66,7 @@ public class GfPolynomial {
     
     /**
      * Modified from PolynomialFunctionLagrangeForm of Apache Common Math 3
+     * Note that this will produce correct polynomial only if all points value smaller than prime
      ** Calculate the coefficients of Lagrange polynomial from the
      ** interpolation data. It takes O(n^2) time.
      ** Note that this computation can be ill-conditioned: Use with caution
@@ -139,7 +140,7 @@ public class GfPolynomial {
         return key;
     }
     
-    //translate from wikipedia by stackoverflow
+    //translated from wikipedia by stackoverflow
     private static BigInteger[] gcdD(BigInteger a, BigInteger b)
     { 
         if (b.compareTo(BigInteger.ZERO) == 0)
@@ -153,7 +154,7 @@ public class GfPolynomial {
         }
     }
     
-    //translate from wikipedia by stackoverflow
+    //translated from wikipedia by stackoverflow
     public static BigInteger modInverse(BigInteger k, BigInteger prime)
     { 
         k = k.mod(prime);

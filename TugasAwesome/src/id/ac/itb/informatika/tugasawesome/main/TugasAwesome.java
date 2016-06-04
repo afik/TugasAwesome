@@ -31,8 +31,8 @@ public class TugasAwesome {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-//        String mainDir = "D:\\AFIK\\Project\\T(ugas) A(wesome)\\test\\";
-        String mainDir = "../test/";
+        String mainDir = "D:\\AFIK\\Project\\T(ugas) A(wesome)\\test\\";
+//        String mainDir = "../test/";
         
         /**Test word processor**/
 //        List<String> tes = FileProcessor.readFile(mainDir + "testFile_3.txt");
@@ -150,10 +150,8 @@ public class TugasAwesome {
 //        System.out.println(poly.evaluatePolynomial(x2));
 //        System.out.println(poly.evaluatePolynomial(x3));
         
-        
-
         /*Protect Mechanism*/
-        String file = mainDir + "testFile.txt";
+        String file = mainDir + "testFile_2.txt";
         
         //P.1 Encrypt message
         byte[] filePlain = FileProcessor.readFileAsBytes(file);
@@ -167,13 +165,13 @@ public class TugasAwesome {
         GfPolynomial poly = Protection.protect(file, key, threshold);
         
         /*Extraction Mechanism*/
-        List<String> guess = Arrays.asList("level", "Mobile", "package", "class", "JAVA");
-//        List<String> guess = Arrays.asList("vitae", "FINIbus", "integer", "ipsum", "Lorem");
-//        List<String> guess = Arrays.asList("vitae", "FINIbus", "notice", "xanadu", "scanner");
+//        List<String> guess = Arrays.asList("level", "Mobile", "package", "class", "JAVA");
+        List<String> guess = Arrays.asList("vitaea", "FINIbusa", "integer", "ipsum", "Lorem");
+//        List<String> guess = Arrays.asList("token", "l", "notice", "xanadu", "scanner");
         byte[] fileCipher = FileProcessor.readFileAsBytes(mainDir+"cipher_2.txt");
         String plain = Extraction.extract(fileCipher, poly, guess);
         System.out.println(plain);
-        
+
         
     }
     

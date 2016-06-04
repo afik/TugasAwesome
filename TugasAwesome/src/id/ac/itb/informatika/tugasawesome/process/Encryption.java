@@ -51,6 +51,12 @@ public class Encryption {
         return plain;
     }
     
+    /**
+     * Decrypt first 16 bytes of cipher text and match it to padding value
+     * @param firstBlock
+     * @param key
+     * @return true if decrypted block match to padding value 
+     */
     public static boolean checkFirstBlock(byte[] firstBlock, byte[] key) {
         byte[] plain = null;
         try {
@@ -66,6 +72,10 @@ public class Encryption {
         return Arrays.equals(plain, PAD);
     }
     
+    /**
+     * Generate key with bit length < 128
+     * @return 
+     */
     public static byte[] generateKey() {
         byte[] keyByte = null;
         try {

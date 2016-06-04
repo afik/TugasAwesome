@@ -2,9 +2,8 @@ package id.ac.itb.informatika.tugasawesome.process;
 
 import id.ac.itb.informatika.tugasawesome.model.GfPolynomial;
 import id.ac.itb.informatika.tugasawesome.model.PointByte;
-import id.ac.itb.informatika.tugasawesome.utils.Operations;
 import id.ac.itb.informatika.tugasawesome.utils.FileProcessor;
-import id.ac.itb.informatika.tugasawesome.utils.WordProcessor;
+import id.ac.itb.informatika.tugasawesome.utils.Operations;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,30 +26,24 @@ public class Protection {
         //P.2 Split the secret
         List<String> words = FileProcessor.readFile(file);
         
-        BigInteger prime = Operations.randomPrime(new BigInteger(1,key));
+        BigInteger prime = Operations.getPrime();
         System.out.println("Prime " + prime + " " + prime.bitLength());
         
         List<BigInteger> xBytes = new ArrayList<>();
         List<PointByte> hashResult = Mapping.wordsToPoint(words, prime);
         for (PointByte point : hashResult) {
             xBytes.add(point.getX());
-//            if (point.getX().compareTo(prime) >= 0) {
-//                System.out.println("x hash lebih besar");
-//            } 
-//            
-//            if (point.getY().compareTo(prime) >= 0) {
-//                System.out.println("y hash lebih besar");
-//            }
         }
         
-        List<PointByte> shares = Shamir.splitKey(key, threshold, xBytes, prime);
+        List<PointByte> shares = new ArrayList<>();
         
-        for (PointByte point : shares) {
-            if (point.getY().bitLength() == prime.bitLength()) {
-                point.setY(point.getY().mod(new BigInteger("2").pow(128)));
-            }
-            System.out.println(point.getX().bitLength() + " " + point.getY().bitLength());
-        }
+        //To make sure we get valid shares
+        int i = 1;
+        do {
+            System.out.println("splitting ke - " + i);
+            shares = Shamir.splitKey(key, threshold, xBytes, prime);
+            i++;
+        } while (shares.isEmpty());
         
         //P.3 connect keyword to share
         GfPolynomial mappingFunction = Mapping.createMappingFunction(hashResult, shares, prime);

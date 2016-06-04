@@ -13,6 +13,16 @@ import java.util.List;
  * @author Khoirunnisa Afifah <khoirunnisa.afik@gmail.com>
  */
 public final class Shamir {
+    
+    /**
+     * Shamir's Secret Share implementation to split key into domain.size() share
+     * @param key
+     * @param threshold : number of minimal share to recover key
+     * @param domain : represent participant
+     * @param prime : should bigger than largest possible key, all coefficient, and number of participant
+     *                in this implementation, prime bit length should be bigger than key & participant bit length
+     * @return 
+     */
     public static List<PointByte> splitKey(byte[] key, int threshold, List<BigInteger> domain, BigInteger prime) {
        System.out.println("split...");
         
@@ -29,12 +39,21 @@ public final class Shamir {
        
        //compute shares
        for (BigInteger x : domain) {
+           
            BigInteger y = poly.evaluatePolynomial(x);
-           if (y.compareTo(prime) > 0) System.out.println("y split lebih besar");
+           
+           //All shares bit length should < prime bit length 
+           //so it wont create participant larger than prime after xor
+           if (y.bitLength() == prime.bitLength()){
+               allShare.clear();
+               break;
+           }
+           
            PointByte point = new PointByte(x,y,prime, false);
            allShare.add(point);
        }
        System.out.println("end of split...");
+       
        return allShare;
     }
     
@@ -43,17 +62,18 @@ public final class Shamir {
      * @param shares : list of share as result of words query mapped to PointByte
      * @return byte[] of possible key
      */
-    public static BigInteger recoverKey(List<PointByte> shares, BigInteger prime) {        
-        List<PointByte> modShares = new ArrayList<>();
-        
-        return GfPolynomial.interpolateAtZero(shares, prime);
+    public static BigInteger recoverKey(List<PointByte> shares, BigInteger prime) {   
+        System.out.println("recover...");
+         
+//        return GfPolynomial.interpolateAtZero(shares, prime);
 
-//        GfPolynomial gf = GfPolynomial.interpolatePolynomial(modShares, prime);
-//        return gf.evaluatePolynomial(BigInteger.ZERO);
+        GfPolynomial gf = GfPolynomial.interpolatePolynomial(shares, prime);
+       System.out.println("end of recover...");
+        return gf.evaluatePolynomial(BigInteger.ZERO);
     }
     
     /**
-     * Random BigInteger that not bigger/equal to secret and prime number
+     * Random BigInteger that smaller to secret and prime number
      */
     private static BigInteger randomCoef(BigInteger secret, BigInteger prime) {
         BigInteger coef;

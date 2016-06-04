@@ -20,7 +20,7 @@ public class PointByte {
     private BigInteger y; //second element of point
     private BigInteger prime; //prime 
     private boolean mod; //flag indicate if x & y should be mod prime; 
-                         //set to true only if you sure bit length of x & y < 128
+                         //set to false only if you sure  x & y < prime
     
     public PointByte(BigInteger p, boolean mod) {
         x = BigInteger.ZERO;

@@ -1,9 +1,7 @@
 package id.ac.itb.informatika.tugasawesome.utils;
 
-import id.ac.itb.informatika.tugasawesome.model.PointByte;
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.List;
 import javax.xml.bind.DatatypeConverter;
 
 /**
@@ -53,45 +51,12 @@ public class Operations {
     }
     
     /**
-     * Generate random prime number with 0 <= bitLength <= 128
-     * and bigger than secret if secret not null
+     * Get smallest 129 bit prime number
      */
-    public static BigInteger randomPrime(BigInteger secret) {
-//        BigInteger prime; 
-//
-//        if (secret != null) {
-//            prime = secret.nextProbablePrime();
-//        } else {
-//            prime = BigInteger.probablePrime(BITLENGTH, RANDOM);
-//        }
-//        
-//        return prime;
+    public static BigInteger getPrime() {
+        //340282366920938463463374607431768211455 is largest number with 128 bit length
+        return new BigInteger("340282366920938463463374607431768211455").nextProbablePrime();
         
-        return BigInteger.probablePrime(BITLENGTH+1, RANDOM);
-//        BigInteger prime;
-//        boolean pass = true;
-//        
-//        do {
-//            pass= true;
-//            prime = BigInteger.probablePrime(BITLENGTH, RANDOM);
-//            if (secret != null) {
-//                if (prime.compareTo(secret) <= 0) {
-//                    System.out.println("prime lebih kecil dari secret");
-//                    pass = false;
-//                }
-//            } 
-//            
-//            for (PointByte p : participant) {
-//                if (p.getX().compareTo(prime) >= 0 || p.getY().compareTo(prime) >= 0) {
-//                    System.out.println("ada participant yg lebih gedhe");
-//                    pass = false;
-//                    break;
-//                }
-//            }
-//            
-//        } while(!pass);
-//        
-//        return prime;
     }
     
 }
