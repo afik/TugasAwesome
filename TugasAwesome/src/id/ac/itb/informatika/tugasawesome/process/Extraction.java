@@ -14,8 +14,14 @@ import java.util.List;
  */
 public class Extraction {
     
-    public static String extract(byte[] cipher, GfPolynomial poly, List<String> guess) {
+    public static String extract(byte[] cipher, GfPolynomial poly, List<String> guess, int threshold) {
         System.out.println("extract...");
+        
+        if (guess.size() < threshold) {
+            System.err.format("minimal number of guess is " + threshold);
+            return null;
+        }
+        
         //E.1 Compute each share
         List<PointByte> allShare = new ArrayList<>();
         for (String word : guess) {
@@ -23,18 +29,40 @@ public class Extraction {
             allShare.add(p);
         }
         
-        //E.2 Compute key
-        BigInteger key =  Shamir.recoverKey(allShare, poly.getPrime());
+        //find all combination of shares
+        List<List<Integer>> shareIdx = Operations.getComposition(allShare.size(), threshold);
         
-        //valid key length is <= 127 
-        if (key.bitLength() > 127) {
-            System.err.format("Key recovered > 128");
-            return null;
+        
+        BigInteger key = null; 
+        boolean success = false;
+        
+        //try share combination
+        for (int i = 0; i<shareIdx.size(); i++) {
+            
+            List<PointByte> subShare = new ArrayList<>();
+            for (Integer sidx : shareIdx.get(i)) {
+                subShare.add(allShare.get(sidx-1));
+            }
+            
+            //E.2 Compute key
+            key =  Shamir.recoverKey(subShare, poly.getPrime());
+            
+            //valid key length is <= 127 
+            if (key.bitLength() > 127) {
+                continue;
+            }
+            
+            System.out.println("Key recovered: " + key);
+        
+            //E.2 Try to decrypt
+            if (Encryption.checkFirstBlock(Operations.getFirstBlock(cipher, 16), key.toByteArray())) {
+                success = true;
+                break;
+            } 
+            
         }
-        
-        System.out.println("Key recovered: " + key);
-        //E.2 Try to decrypt
-        if (Encryption.checkFirstBlock(Operations.getFirstBlock(cipher, 16), key.toByteArray())) {
+
+        if (success) {
             byte[] decrypted = Encryption.decrypt(cipher, key.toByteArray());
             byte[] plain2 = Arrays.copyOfRange(decrypted, 16, decrypted.length);
             System.out.println("end of extract...");
@@ -43,5 +71,7 @@ public class Extraction {
             System.out.println("end of extract...");
             return null;   
         }
+
+
     }
 }

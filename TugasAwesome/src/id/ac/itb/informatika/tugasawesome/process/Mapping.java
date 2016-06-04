@@ -26,7 +26,7 @@ public class Mapping {
      * @param salt
      * @return 
      */
-    public static byte[] Hash(byte[] word, byte[] salt) {
+    private static byte[] Hash(byte[] word, byte[] salt) {
         byte[] hashWord = null;
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -104,6 +104,7 @@ public class Mapping {
             
             
             BigInteger valY = hashResult.get(i).getY().xor(shares.get(i).getY());
+            
             PointByte a = new PointByte(shares.get(i).getX(), valY, prime, false);
             points.add(a);
         }

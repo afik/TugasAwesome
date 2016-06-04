@@ -2,6 +2,8 @@ package id.ac.itb.informatika.tugasawesome.utils;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.bind.DatatypeConverter;
 
 /**
@@ -10,9 +12,9 @@ import javax.xml.bind.DatatypeConverter;
  */
 public class Operations {
     
-    public static SecureRandom RANDOM = new SecureRandom();
-    public static final int SIZE = 16;
-     private static int BITLENGTH = 128;
+    private static SecureRandom RANDOM = new SecureRandom();
+    private static final int SIZE = 16;
+    private static final int BITLENGTH = 128;
     
     public static byte[] addBytes(byte[] a, byte[] b) {
         byte[] c = new byte[a.length+b.length];
@@ -58,5 +60,25 @@ public class Operations {
         return new BigInteger("340282366920938463463374607431768211455").nextProbablePrime();
         
     }
+    
+    public static List<List<Integer>> getComposition(int nShares, int threshold) {
+        List<List<Integer>> result = new ArrayList<>();
+        
+        if (threshold == 0) {
+            result.add(new ArrayList<Integer>());
+            return result;
+        }
+        
+        for(int val = threshold; val <= nShares; val++) {
+            List<List<Integer>> sub = getComposition(val-1, threshold-1);
+            for(int i=0; i< sub.size(); i++) {
+                sub.get(i).add(val);
+            }
+            result.addAll(result.size(), sub);
+        }
+        
+        return result;
+    }
+    
     
 }

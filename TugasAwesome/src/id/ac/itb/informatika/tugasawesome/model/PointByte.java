@@ -13,8 +13,7 @@ public class PointByte {
     /**
      * size of each point element
      **/
-    private static int BITLENGTH = 128; 
-    private static int SIZE = 16;  //128 bit in byte, but sometimes 128 bit can use 17 byte array 
+    private final int SIZE = 16;  //128 bit in byte, but sometimes 128 bit can use 17 byte array 
     
     private BigInteger x; //first element of point
     private BigInteger y; //second element of point
@@ -139,15 +138,6 @@ public class PointByte {
 
     public void setMod(boolean mod) {
         this.mod = mod;
-    }
-    
-    /**
-     * Check is element in GF(2^128)
-     * @param element
-     * @return true if element in GF(2^128)
-     */
-    public static boolean isValidElement(BigInteger element) {
-        return element.bitLength() <= BITLENGTH && element.compareTo(BigInteger.ZERO) >= 0;
     }
     
     public void printHex() {

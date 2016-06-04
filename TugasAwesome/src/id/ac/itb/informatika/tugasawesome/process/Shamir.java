@@ -60,16 +60,18 @@ public final class Shamir {
     /**
      * Get value of f(0) from polynomials using Lagrange interpolation
      * @param shares : list of share as result of words query mapped to PointByte
+     * @param prime
+     * @param threshold
      * @return byte[] of possible key
      */
     public static BigInteger recoverKey(List<PointByte> shares, BigInteger prime) {   
         System.out.println("recover...");
-         
-//        return GfPolynomial.interpolateAtZero(shares, prime);
+        
+        System.out.println("end of recover...");
+        return GfPolynomial.interpolateAtZero(shares, prime);
 
-        GfPolynomial gf = GfPolynomial.interpolatePolynomial(shares, prime);
-       System.out.println("end of recover...");
-        return gf.evaluatePolynomial(BigInteger.ZERO);
+//        GfPolynomial gf = GfPolynomial.interpolatePolynomial(shares, prime);
+//        return gf.evaluatePolynomial(BigInteger.ZERO);
     }
     
     /**
