@@ -24,7 +24,7 @@ public final class Shamir {
      * @return 
      */
     public static List<PointByte> splitKey(byte[] key, int threshold, List<BigInteger> domain, BigInteger prime) {
-       System.out.println("split...");
+//       System.out.println("split...");
         
         List<PointByte> allShare = new ArrayList<>();
                 
@@ -52,7 +52,7 @@ public final class Shamir {
            PointByte point = new PointByte(x,y,prime, false);
            allShare.add(point);
        }
-       System.out.println("end of split...");
+//       System.out.println("end of split...");
        
        return allShare;
     }
@@ -65,9 +65,9 @@ public final class Shamir {
      * @return byte[] of possible key
      */
     public static BigInteger recoverKey(List<PointByte> shares, BigInteger prime) {   
-        System.out.println("recover...");
+//        System.out.println("recover...");
         
-        System.out.println("end of recover...");
+//        System.out.println("end of recover...");
         return GfPolynomial.interpolateAtZero(shares, prime);
 
 //        GfPolynomial gf = GfPolynomial.interpolatePolynomial(shares, prime);

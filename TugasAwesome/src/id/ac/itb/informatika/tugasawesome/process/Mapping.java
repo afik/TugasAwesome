@@ -46,7 +46,7 @@ public class Mapping {
      * @return 
      */
     public static List<PointByte> wordsToPoint(List<String> listWords, BigInteger prime) {
-        System.out.println("map words to point...");
+//        System.out.println("map words to point...");
         Set<PointByte> setPoint = new HashSet<>();
         byte[] salt = DUMMYSALT.getBytes();
         
@@ -75,7 +75,7 @@ public class Mapping {
             }
         }
         
-        System.out.println("end of map words to point...");
+//        System.out.println("end of map words to point...");
         return new ArrayList<>(setPoint);
     }
     
@@ -88,7 +88,7 @@ public class Mapping {
      */
     public static GfPolynomial createMappingFunction(List<PointByte> hashResult,
                                                     List<PointByte> shares, BigInteger prime) {
-        System.out.println("create mapping function...");
+//        System.out.println("create mapping function...");
         
         if (hashResult.size() != shares.size()) {
             throw new IllegalArgumentException("Mapping error : hashResult and shares should be same size");
@@ -109,7 +109,7 @@ public class Mapping {
             points.add(a);
         }
         
-        System.out.println("end of create mapping function...");
+//        System.out.println("end of create mapping function...");
         return GfPolynomial.interpolatePolynomial(points, prime);
     }
 

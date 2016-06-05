@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -24,12 +25,12 @@ public class FileProcessor {
      * @param path
      * @return 
      */
-    public static List<String> readFile(String path) {
+    public static List<String> readFile(Path path) {
         Scanner s = null;
         Set<String> setVal = new HashSet<>();
         
         try {
-            s = new Scanner(new BufferedReader(new FileReader(path)));
+            s = new Scanner(new BufferedReader(new FileReader(path.toFile())));
             s.useDelimiter("[\\W]");
             s.useLocale(Locale.US);
             while (s.hasNext()) {
@@ -54,8 +55,8 @@ public class FileProcessor {
      * @param path
      * @return 
      */
-    public static byte[] readFileAsBytes(String path) {
-        File file = new File(path);
+    public static byte[] readFileAsBytes(Path path) {
+        File file = path.toFile();
         FileInputStream fin = null;
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
@@ -78,8 +79,8 @@ public class FileProcessor {
         return bos.toByteArray();
     }
     
-    public static void saveToFile(byte[] content, String filename) {
-        File newfile = new File(filename);
+    public static void saveToFile(byte[] content, Path savePath, String filename) {
+        File newfile = new File(savePath.toString() + "/" +filename);
         try {
             FileOutputStream fos = new FileOutputStream(newfile);
             fos.write(content);

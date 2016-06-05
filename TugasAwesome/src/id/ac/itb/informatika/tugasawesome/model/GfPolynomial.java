@@ -1,6 +1,7 @@
 package id.ac.itb.informatika.tugasawesome.model;
 
 import id.ac.itb.informatika.tugasawesome.utils.Operations;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,11 +11,19 @@ import java.util.List;
  *
  * @author Khoirunnisa Afifah <khoirunnisa.afik@gmail.com>
  */
-public class GfPolynomial {
+public class GfPolynomial implements Serializable {
     
     private List<BigInteger> coeff;
     private int degree;
     private BigInteger prime;
+    
+    /**
+     * This is not valid constructor of GfPolynomial
+     * Use to serialize threshold value
+     */
+    public GfPolynomial(int threshold) {
+        degree = threshold;
+    }
     
     /**
      * Create polynomial with coefficient from {init}

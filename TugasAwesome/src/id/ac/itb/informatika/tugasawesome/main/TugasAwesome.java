@@ -13,6 +13,8 @@ import id.ac.itb.informatika.tugasawesome.process.Protection;
 import id.ac.itb.informatika.tugasawesome.utils.WordProcessor;
 import java.io.File;
 import java.math.BigInteger;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +37,8 @@ public class TugasAwesome {
 //        String mainDir = "../test/";
         
         /**Test word processor**/
-        List<String> tes = FileProcessor.readFile(mainDir + "testFile_3.txt");
+//        Path p = Paths.get(mainDir + "txt\\testFile_3.txt");
+//        List<String> tes = FileProcessor.readFile(p);
 //        System.out.println(tes.size());
 //        for (String a : tes) {
 //            System.out.println(a);
@@ -154,24 +157,26 @@ public class TugasAwesome {
 //        System.out.println(poly.evaluatePolynomial(x3));
         
         /*Protect Mechanism*/
-        String file = mainDir + "testFile_3.txt";
+        Path file = Paths.get(mainDir + "txt/testFile.txt");
         
         //P.1 Encrypt message
         byte[] filePlain = FileProcessor.readFileAsBytes(file);
         byte[] key = Encryption.generateKey();
         System.out.println("Key " + new BigInteger(1,key) + " : " + new BigInteger(1,key).bitLength());
         byte[] cipher = Encryption.encrypt(filePlain, key);
-        FileProcessor.saveToFile(cipher, mainDir+"cipher_2.txt");
+        Path toSave = Paths.get(mainDir + "cipher/");
+        FileProcessor.saveToFile(cipher, toSave, "cipher.txt");
         
         //P.2 and P.3
-        int threshold = 7;
+        int threshold = 3;
         GfPolynomial poly = Protection.protect(file, key, threshold);
         
         /*Extraction Mechanism*/
-//        List<String> guess = Arrays.asList("level", "Mobile", "package", "class", "JAVA");
+        List<String> guess = Arrays.asList("level", "Mobile", "package", "class", "JAVA");
 //        List<String> guess = Arrays.asList("afik", "integer", "tolep", "ipsum", "Lorem");
-        List<String> guess = Arrays.asList("token", "defaults", "notice", "xanadu", "scanner");
-        byte[] fileCipher = FileProcessor.readFileAsBytes(mainDir+"cipher_2.txt");
+//        List<String> guess = Arrays.asList("token", "defaults", "notice", "xanadu", "scanner");
+        Path toRead = Paths.get(toSave.toString() + "/cipher.txt");
+        byte[] fileCipher = FileProcessor.readFileAsBytes(toRead);
         String plain = Extraction.extract(fileCipher, poly, guess, threshold);
         System.out.println(plain);
         

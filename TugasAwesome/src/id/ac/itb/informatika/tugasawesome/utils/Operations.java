@@ -61,7 +61,13 @@ public class Operations {
         
     }
     
-    public static List<List<Integer>> getComposition(int nShares, int threshold) {
+    /**
+     * Combination {threshold} element from 1 - {nShares} integer
+     * @param nShares
+     * @param threshold
+     * @return 
+     */
+    public static List<List<Integer>> getCombinationIdx(int nShares, int threshold) {
         List<List<Integer>> result = new ArrayList<>();
         
         if (threshold == 0) {
@@ -70,7 +76,7 @@ public class Operations {
         }
         
         for(int val = threshold; val <= nShares; val++) {
-            List<List<Integer>> sub = getComposition(val-1, threshold-1);
+            List<List<Integer>> sub = getCombinationIdx(val-1, threshold-1);
             for(int i=0; i< sub.size(); i++) {
                 sub.get(i).add(val);
             }
