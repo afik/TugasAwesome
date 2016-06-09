@@ -23,7 +23,6 @@ import java.util.List;
 public class Extraction {
     
     public static String extract(byte[] cipher, GfPolynomial poly, List<String> guess, int threshold) {
-//        System.out.println("extract...");
         
         if (guess.size() < threshold) {
             System.err.format("minimal number of guess is " + threshold);
@@ -55,13 +54,11 @@ public class Extraction {
             //E.2 Compute key
             key =  Shamir.recoverKey(subShare, poly.getPrime());
             
-            //valid key length is <= 127 
-            if (key.bitLength() > 127) {
+            //valid key byte length is 16
+            if (key.toByteArray().length != 16) {
                 continue;
             }
             
-//            System.out.println("Key recovered: " + key);
-        
             //E.2 Try to decrypt
             if (Encryption.checkFirstBlock(Operations.getFirstBlock(cipher, 16), key.toByteArray())) {
                 success = true;
@@ -73,10 +70,8 @@ public class Extraction {
         if (success) {
             byte[] decrypted = Encryption.decrypt(cipher, key.toByteArray());
             byte[] plain2 = Arrays.copyOfRange(decrypted, 16, decrypted.length);
-//            System.out.println("end of extract...");
             return new String(plain2);
         } else {
-//            System.out.println("end of extract...");
             return null;   
         }
 
