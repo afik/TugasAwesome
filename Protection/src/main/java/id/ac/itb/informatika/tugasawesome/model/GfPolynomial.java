@@ -12,6 +12,7 @@ import java.util.List;
  * @author Khoirunnisa Afifah <khoirunnisa.afik@gmail.com>
  */
 public class GfPolynomial implements Serializable {
+    private static final long serialVersionUID = 1L;
     
     private List<BigInteger> coeff;
     private int degree;

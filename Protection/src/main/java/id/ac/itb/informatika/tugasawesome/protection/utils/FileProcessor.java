@@ -4,11 +4,17 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
+import org.apache.tika.detect.DefaultDetector;
+import org.apache.tika.detect.Detector;
+import org.apache.tika.io.TikaInputStream;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.mime.MimeTypes;
 
 /**
  *
@@ -68,17 +74,31 @@ public abstract class FileProcessor {
         } 
     }
     
-    public static String getFileExtension(String fileName) {
-        String extension = "";
+    public static String getFileExtension(final File file) {
+        try (TikaInputStream tikaIS = TikaInputStream.get(file)) {
 
-        int i = fileName.lastIndexOf('.');
-        int p = Math.max(fileName.lastIndexOf('/'), fileName.lastIndexOf('\\'));
-
-        if (i > p) {
-            extension = fileName.substring(i+1);
+            final Metadata metadata = new Metadata();
+           
+            return DETECTOR.detect(tikaIS, metadata).toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
         }
-        
-        return extension;
+    }
+    
+    private static final Detector DETECTOR = new DefaultDetector(
+            MimeTypes.getDefaultMimeTypes());
+    
+    public static boolean isWordDocument(final File file) {
+        return ("application/x-tika-ooxml").equalsIgnoreCase(getFileExtension(file));
+    }
+    
+    public static boolean isTxtDocument(final File file) {
+        return ("text/plain").equalsIgnoreCase(getFileExtension(file));
+    }
+    
+    public static boolean isPdfDocument(final File file) {
+        return ("application/pdf").equalsIgnoreCase(getFileExtension(file));
     }
     
 }

@@ -73,37 +73,43 @@ public class Protection {
         GfPolynomial thPoly = new GfPolynomial (threshold);
         allpolynomials.add(thPoly);
         
+        new File(outputPath).mkdir();
+        Path toSave = Paths.get(outputPath);
+        
         System.out.println("Protection started with threshold : " + threshold);
+        long startTime = System.nanoTime();
         Files.walk(Paths.get(rootPath)).forEach(filePath -> {
             if (Files.isRegularFile(filePath)) {
-                System.out.println(filePath);
-                
                 FileProcessor fileProcessor;
-                String extension = FileProcessor.getFileExtension(filePath.toString());
-                if ("doc".equalsIgnoreCase(extension)) {
+                String filetype;
+                if (FileProcessor.isWordDocument(filePath.toFile())) {
                    fileProcessor = new WordFileProcessor();
-                } else if ("pdf".equalsIgnoreCase(extension)) {
+                   filetype = "word";
+                } else if (FileProcessor.isPdfDocument(filePath.toFile())) {
                     fileProcessor = new PdfFileProcessor(); 
+                    filetype = "pdf";
                 } else {
                    fileProcessor = new TxtFileProcessor();
+                   filetype = "plain";
                 }
                 
                 byte[] filePlain = fileProcessor.readFileAsBytes(filePath);
                 byte[] key = Encryption.generateKey();
                 byte[] cipher = Encryption.encrypt(filePlain, key);
-                new File(outputPath).mkdir();
-                Path toSave = Paths.get(outputPath);
+                
                 fileProcessor.saveToFile(cipher, toSave, filePath);
 
                 //P.2 and P.3
                 List<String> wordsInFile = fileProcessor.readFile(filePath);
                 GfPolynomial poly = protect(wordsInFile, key, threshold);
                 allpolynomials.add(poly);
-                
+              
+                System.out.println(filePath + " " + filetype + " " + wordsInFile.size());
             }
         });
-        
-        System.out.println("Total Files : " + allpolynomials.size());
+        long totalTime = System.nanoTime() - startTime;
+        System.out.println("Finished in : " + totalTime/ 1000000L + " ms");
+        System.out.println("Total Files : " + (allpolynomials.size()-1));
         
         //Save GF poynomials to file
         FileOutputStream fos = new FileOutputStream(outputPath + "/meta.ser");

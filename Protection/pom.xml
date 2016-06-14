@@ -24,6 +24,12 @@
             <artifactId>pdfbox</artifactId>
             <version>1.8.5</version>
         </dependency>
+        <!-- http://mvnrepository.com/artifact/org.apache.tika/tika-core -->
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+            <version>1.13</version>
+        </dependency>
 
     </dependencies>
     

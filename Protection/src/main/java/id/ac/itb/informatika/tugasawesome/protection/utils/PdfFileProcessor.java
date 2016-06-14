@@ -52,6 +52,14 @@ public class PdfFileProcessor extends FileProcessor{
             parsedText = pdfStripper.getText(pdDoc);
         } catch (IOException e) {
             System.err.format("Exception : " + e.getMessage());
+        } finally {
+            try {
+                if (pdDoc != null) {
+                pdDoc.close();
+                }
+            } catch (IOException e) {
+                System.err.format("Exception : " + e.getMessage());
+            }
         }
         return parsedText;
     }
