@@ -4,6 +4,7 @@ import id.ac.itb.informatika.tugasawesome.model.GfPolynomial;
 import id.ac.itb.informatika.tugasawesome.model.PointByte;
 import id.ac.itb.informatika.tugasawesome.utils.FileProcessor;
 import id.ac.itb.informatika.tugasawesome.utils.Operations;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -22,7 +23,7 @@ import java.util.List;
  */
 public class Extraction {
     
-    public static String extract(byte[] cipher, GfPolynomial poly, List<String> guess, int threshold) {
+    public static byte[] extract(byte[] cipher, GfPolynomial poly, List<String> guess, int threshold) {
         
         if (guess.size() < threshold) {
             System.err.format("minimal number of guess is " + threshold);
@@ -70,7 +71,7 @@ public class Extraction {
         if (success) {
             byte[] decrypted = Encryption.decrypt(cipher, key.toByteArray());
             byte[] plain2 = Arrays.copyOfRange(decrypted, 16, decrypted.length);
-            return new String(plain2);
+            return plain2;
         } else {
             return null;   
         }
@@ -78,15 +79,16 @@ public class Extraction {
     }
     
     public static void main(String args[]) throws FileNotFoundException, IOException, ClassNotFoundException {
-        if (args.length < 2) {
+        if (args.length < 3) {
             System.out.println("Invalid argument.");
-            System.out.println("Usage : java -jar extract.jar <root_file_path> <keywords>...");
+            System.out.println("Usage : java -jar Extraction.jar <root_file_path> <output_path> <keywords>...");
             return;
         }
         
         String rootPath = args[0];
-        List<String> wordQuery = Arrays.asList(Arrays.copyOfRange(args, 1, args.length));
-        
+        List<String> wordQuery = Arrays.asList(Arrays.copyOfRange(args, 2, args.length));
+        String outputPath = args[1];
+                
         //Load meta file
         FileInputStream fis = new FileInputStream(rootPath + "/meta.ser");
         ObjectInputStream in = new ObjectInputStream(fis);
@@ -95,34 +97,45 @@ public class Extraction {
         fis.close();
         
         int threshold = allpolynomials.get(0).getDegree();
+        allpolynomials.remove(0);
         
         List<Path> listFile = new ArrayList<>();
         Files.walk(Paths.get(rootPath)).forEach(filePath -> {
-            if (Files.isRegularFile(filePath)) {
+            if (Files.isRegularFile(filePath) && 
+                !filePath.getFileName().toString().equalsIgnoreCase("meta.ser")) {
                 listFile.add(filePath);
             }
         });
+        
         
         if (listFile.size() != allpolynomials.size()) {
             System.err.format("Invalid meta file\n");
             return;
         }
         
+        System.out.println(listFile);
+        
         System.out.println("Searching started with query : " + wordQuery);
         boolean found = false;
-        for (int idx = 1; idx <listFile.size(); idx++) {
-            byte[] fileCipher = FileProcessor.readFileAsBytes(listFile.get(idx));
-            String plain = Extraction.extract(fileCipher, allpolynomials.get(idx), wordQuery, threshold);
-            if (plain != null) {
-                System.out.println("\n Found in file " + listFile.get(idx) + "\n");
-                System.out.println(plain);
-                System.out.println("=============================================");
-                found = true;
+        
+        new File(outputPath).mkdir();
+        Path toSave = Paths.get(outputPath);
+        
+        for (int idx = 0; idx <listFile.size(); idx++) {
+            if (!listFile.get(idx).getFileName().toString().equalsIgnoreCase("meta.ser")){
+                System.out.println(listFile.get(idx));
+                byte[] fileCipher = FileProcessor.readFileAsBytes(listFile.get(idx));
+                byte[] plain = Extraction.extract(fileCipher, allpolynomials.get(idx), wordQuery, threshold);
+                if (plain != null) {
+                    System.out.println("\n Found in file " + listFile.get(idx) + "\n");
+                    FileProcessor.saveToFile(plain, toSave, listFile.get(idx));
+                    found = true;
+                }
             }
         }
         
         if (!found) {
             System.out.println("Not found");
-        }
+        } 
     }
 }

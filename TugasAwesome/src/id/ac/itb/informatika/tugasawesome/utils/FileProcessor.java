@@ -6,7 +6,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -79,15 +82,22 @@ public class FileProcessor {
         return bos.toByteArray();
     }
     
-    public static void saveToFile(byte[] content, Path savePath, String filename) {
-        File newfile = new File(savePath.toString() + "/" +filename);
+    public static void saveToFile(byte[] content, Path savePath, Path original) {
+        Path finalPath = Paths.get(savePath.toString() + "/" + original.getFileName().toString());
+        File newfile = new File(finalPath.toString());
         try {
+            BasicFileAttributes attr = Files.readAttributes(original, BasicFileAttributes.class);
+            
             FileOutputStream fos = new FileOutputStream(newfile);
             fos.write(content);
             fos.flush();
             fos.close();
+            Files.setAttribute(finalPath, "creationTime", attr.creationTime());
+            Files.setAttribute(finalPath, "lastModifiedTime", attr.lastModifiedTime());
+            Files.setAttribute(finalPath, "creationTime", attr.lastAccessTime());
+            
         } catch (Exception e) {
-            System.err.format("Exception: " + e.getMessage());
+            System.err.format("IO Exception : " + e.getMessage());
         } 
     }
     

@@ -165,7 +165,7 @@ public class TugasAwesome {
         System.out.println("Key " + new BigInteger(1,key) + " : " + new BigInteger(1,key).bitLength());
         byte[] cipher = Encryption.encrypt(filePlain, key);
         Path toSave = Paths.get(mainDir + "cipher/");
-        FileProcessor.saveToFile(cipher, toSave, "cipher.txt");
+        FileProcessor.saveToFile(cipher, toSave, file);
         
         //P.2 and P.3
         int threshold = 3;
@@ -177,8 +177,8 @@ public class TugasAwesome {
 //        List<String> guess = Arrays.asList("token", "defaults", "notice", "xanadu", "scanner");
         Path toRead = Paths.get(toSave.toString() + "/cipher.txt");
         byte[] fileCipher = FileProcessor.readFileAsBytes(toRead);
-        String plain = Extraction.extract(fileCipher, poly, guess, threshold);
-        System.out.println(plain);
+        byte[] plain = Extraction.extract(fileCipher, poly, guess, threshold);
+        System.out.println(new String(plain));
         
         
     }

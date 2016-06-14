@@ -86,7 +86,7 @@ public class Protection {
                 byte[] cipher = Encryption.encrypt(filePlain, key);
                 new File(outputPath).mkdir();
                 Path toSave = Paths.get(outputPath);
-                FileProcessor.saveToFile(cipher, toSave, filePath.getFileName().toString());
+                FileProcessor.saveToFile(cipher, toSave, filePath);
 
                 //P.2 and P.3
                 GfPolynomial poly = protect(filePath, key, threshold);
