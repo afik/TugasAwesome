@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class Extraction {
     
-    public static byte[] extract(byte[] cipher, GfPolynomial poly, List<String> guess, int threshold) {
+    public static byte[] extract(byte[] cipher, List<GfPolynomial> poly, List<String> guess, int threshold) {
         
         if (guess.size() < threshold) {
             System.err.format("minimal number of guess is " + threshold);
@@ -33,7 +33,8 @@ public class Extraction {
         //E.1 Compute each share
         List<PointByte> allShare = new ArrayList<>();
         for (String word : guess) {
-            PointByte p = Mapping.getShare(poly, word.toLowerCase(), poly.getPrime());
+            int idx = Mapping.getSubFunctionIdx(word);
+            PointByte p = Mapping.getShare(poly.get(idx), word.toLowerCase());
             allShare.add(p);
         }
         
@@ -53,7 +54,7 @@ public class Extraction {
             }
             
             //E.2 Compute key
-            key =  Shamir.recoverKey(subShare, poly.getPrime());
+            key =  Shamir.recoverKey(subShare, poly.get(0).getPrime());
             
             //valid key byte length is 16
             if (key.toByteArray().length != 16) {
@@ -92,11 +93,11 @@ public class Extraction {
         //Load meta file
         FileInputStream fis = new FileInputStream(rootPath + "/meta.ser");
         ObjectInputStream in = new ObjectInputStream(fis);
-        List<GfPolynomial> allpolynomials = (List) in.readObject();
+        List<List<GfPolynomial>> allpolynomials = (List) in.readObject();
         in.close();
         fis.close();
         
-        int threshold = allpolynomials.get(0).getDegree();
+        int threshold = allpolynomials.get(0).get(0).getDegree();
         allpolynomials.remove(0);
         
         List<Path> listFile = new ArrayList<>();
@@ -122,15 +123,12 @@ public class Extraction {
         Path toSave = Paths.get(outputPath);
         
         for (int idx = 0; idx <listFile.size(); idx++) {
-            if (!listFile.get(idx).getFileName().toString().equalsIgnoreCase("meta.ser")){
-                System.out.println(listFile.get(idx));
-                byte[] fileCipher = FileProcessor.readFileAsBytes(listFile.get(idx));
-                byte[] plain = Extraction.extract(fileCipher, allpolynomials.get(idx), wordQuery, threshold);
-                if (plain != null) {
-                    System.out.println("\n Found in file " + listFile.get(idx) + "\n");
-                    FileProcessor.saveToFile(plain, toSave, listFile.get(idx));
-                    found = true;
-                }
+            byte[] fileCipher = FileProcessor.readFileAsBytes(listFile.get(idx));
+            byte[] plain = Extraction.extract(fileCipher, allpolynomials.get(idx), wordQuery, threshold);
+            if (plain != null) {
+                System.out.println("Found in file " + listFile.get(idx));
+                FileProcessor.saveToFile(plain, toSave, listFile.get(idx));
+                found = true;
             }
         }
         

@@ -4,9 +4,6 @@ import id.ac.itb.informatika.tugasawesome.model.GfPolynomial;
 import id.ac.itb.informatika.tugasawesome.model.PointByte;
 import id.ac.itb.informatika.tugasawesome.protection.utils.FileProcessor;
 import id.ac.itb.informatika.tugasawesome.protection.utils.Operations;
-import id.ac.itb.informatika.tugasawesome.protection.utils.PdfFileProcessor;
-import id.ac.itb.informatika.tugasawesome.protection.utils.TxtFileProcessor;
-import id.ac.itb.informatika.tugasawesome.protection.utils.WordFileProcessor;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -31,7 +28,7 @@ public class Protection {
      * @param threshold to split key, shouldn't bigger than number of distinct words in {file}
      * @return 
      */
-    public static GfPolynomial protect(List<String> words, byte[] key, int threshold) {
+    public static List<GfPolynomial> protect(List<String> words, byte[] key, int threshold) {
         //P.2 Split the secret
         BigInteger prime = Operations.getPrime();
         
@@ -51,12 +48,12 @@ public class Protection {
         } while (shares.isEmpty());
         
         //P.3 connect keyword to share
-        GfPolynomial mappingFunction = Mapping.createMappingFunction(hashResult, shares, prime);
+        List<GfPolynomial> mappingFunction = Mapping.createMappingFunction(hashResult, shares, prime);
         
         return mappingFunction;
     }
     
-    public static void main(String args[]) throws IOException {
+    public static void main(String args[]) throws IOException, Exception {
         if (args.length < 3) {
             System.out.println("Invalid argument.");
             System.out.println("Usage : java -jar Protection.jar <root_file_path> <threshold> <output>");
@@ -67,11 +64,14 @@ public class Protection {
         int threshold = Integer.valueOf(args[1]);
         String outputPath = args[2];
         
-        List<GfPolynomial> allpolynomials = new ArrayList<>();
+        List<List<GfPolynomial>> allpolynomials = new ArrayList<>();
+        List<String> md5 = new ArrayList<>();
         
         //threshold value stored in GfPoly for serialization
         GfPolynomial thPoly = new GfPolynomial (threshold);
-        allpolynomials.add(thPoly);
+        List<GfPolynomial> p = new ArrayList<>();
+        p.add(thPoly);
+        allpolynomials.add(p);
         
         new File(outputPath).mkdir();
         Path toSave = Paths.get(outputPath);
@@ -80,31 +80,26 @@ public class Protection {
         long startTime = System.nanoTime();
         Files.walk(Paths.get(rootPath)).forEach(filePath -> {
             if (Files.isRegularFile(filePath)) {
-                FileProcessor fileProcessor;
-                String filetype;
-                if (FileProcessor.isWordDocument(filePath.toFile())) {
-                   fileProcessor = new WordFileProcessor();
-                   filetype = "word";
-                } else if (FileProcessor.isPdfDocument(filePath.toFile())) {
-                    fileProcessor = new PdfFileProcessor(); 
-                    filetype = "pdf";
-                } else {
-                   fileProcessor = new TxtFileProcessor();
-                   filetype = "plain";
-                }
+                long subTime = System.nanoTime();
                 
-                byte[] filePlain = fileProcessor.readFileAsBytes(filePath);
+                //TODO : count md5 each file
+                
+                byte[] filePlain = FileProcessor.readFileAsBytes(filePath);
                 byte[] key = Encryption.generateKey();
                 byte[] cipher = Encryption.encrypt(filePlain, key);
                 
-                fileProcessor.saveToFile(cipher, toSave, filePath);
+                FileProcessor.saveToFile(cipher, toSave, filePath);
 
                 //P.2 and P.3
-                List<String> wordsInFile = fileProcessor.readFile(filePath);
-                GfPolynomial poly = protect(wordsInFile, key, threshold);
-                allpolynomials.add(poly);
-              
-                System.out.println(filePath + " " + filetype + " " + wordsInFile.size());
+                List<String> wordsInFile = FileProcessor.readFile(filePath);
+                if (wordsInFile.size() > 0) {
+                    String filetype = FileProcessor.getFileExtension(filePath.toFile());
+                    List<GfPolynomial> poly = protect(wordsInFile, key, threshold);
+                    allpolynomials.add(poly);
+                
+                    long subTime2 = System.nanoTime() - subTime;
+                    System.out.println(filePath + " " + filetype + " " + wordsInFile.size() + " " + subTime2/1000000L+ "ms");
+                }
             }
         });
         long totalTime = System.nanoTime() - startTime;
@@ -120,4 +115,5 @@ public class Protection {
         System.out.println("Meta files saved in " + outputPath+"/meta.ser");
         
     }
+    
 }

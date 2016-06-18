@@ -79,35 +79,40 @@ public class Mapping {
     }
     
     /**
-     * Create a polynomial by interpolating value of (x, y XOR z)
+     * Create list of subpolynomial by interpolating value of (x, y XOR z)
      * @param hashResult list of point (x, z)
      * @param shares list of point (x, y)
      * @param prime
      * @return 
      */
-    public static GfPolynomial createMappingFunction(List<PointByte> hashResult,
+    public static List<GfPolynomial> createMappingFunction(List<PointByte> hashResult,
                                                     List<PointByte> shares, BigInteger prime) {
         
         if (hashResult.size() != shares.size()) {
             throw new IllegalArgumentException("Mapping error : hashResult and shares should be same size");
         }
         
-        List<PointByte> points = new ArrayList<>();
+        List<GfPolynomial> result = new ArrayList<>();
         
+        List<List<PointByte>> points = new ArrayList<>();
+        
+        //find point for each corresponding subfuntion
         for (int i = 0; i< hashResult.size(); i++) {
-            
             if (!hashResult.get(i).getX().equals(shares.get(i).getX())) {
                 throw new IllegalArgumentException("Mapping Error : All X value in hashResult and shares should equal");
             } 
-            
-            
             BigInteger valY = hashResult.get(i).getY().xor(shares.get(i).getY());
-            
             PointByte a = new PointByte(shares.get(i).getX(), valY, prime, false);
-            points.add(a);
+            BigInteger index = hashResult.get(i).getX().mod(new BigInteger("15"));
+            points.get(index.intValueExact()).add(a);
         }
         
-        return GfPolynomial.interpolatePolynomial(points, prime);
+        //interpolate each subfunction
+        points.stream().forEach((p) -> {
+            result.add(GfPolynomial.interpolatePolynomial(p, prime));
+        });
+        
+        return result;
     }
 
 }

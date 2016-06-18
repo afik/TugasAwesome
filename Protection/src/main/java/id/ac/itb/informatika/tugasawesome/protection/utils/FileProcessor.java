@@ -4,17 +4,26 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import org.apache.tika.config.TikaConfig;
 import org.apache.tika.detect.DefaultDetector;
 import org.apache.tika.detect.Detector;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.mime.MimeTypes;
+import org.apache.tika.parser.AutoDetectParser;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.Parser;
+import org.apache.tika.sax.BodyContentHandler;
 
 /**
  *
@@ -24,14 +33,45 @@ public abstract class FileProcessor {
     
     public FileProcessor() {}
     
-    public abstract List<String> readFile(Path path);
+    public static List<String> readFile(Path path) {
+        String content = getText(path);
+         
+         Set<String> setVal = new HashSet<>();
+         String pattern = "[^\\w]"; //split with anything but word
+         String pattern2 = "^[0-9]*$"; //eliminate all number only
+         String[] splitted = content.split(pattern);
+         for (String a : splitted) {
+             if (a.trim().length() > 0 && !a.matches(pattern2)) {
+                 setVal.add(a.toLowerCase());
+             }
+         }
+         
+        return new ArrayList<>(setVal);
+    }
+    
+    private static String getText(Path path) {
+        try{
+            File file = path.toFile();
+            Parser parser = new AutoDetectParser();
+            BodyContentHandler handler = new BodyContentHandler(-1);
+            Metadata metadata = new Metadata();
+            FileInputStream stream = new FileInputStream(file);
+            ParseContext context = new ParseContext();
+            parser.parse(stream, handler, metadata, context);
+            return handler.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
     
     /**
      * Read file specified by {path} as byte array
      * @param path
      * @return 
      */
-    public byte[] readFileAsBytes(Path path) {
+    public static byte[] readFileAsBytes(Path path) {
         File file = path.toFile();
         FileInputStream fin = null;
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -55,23 +95,35 @@ public abstract class FileProcessor {
         return bos.toByteArray();
     }
     
-    public void saveToFile(byte[] content, Path savePath, Path original) {
+    public static void saveToFile(byte[] content, Path savePath, Path original) {
         Path finalPath = Paths.get(savePath.toString() + "/" + original.getFileName().toString());
         File newfile = new File(finalPath.toString());
         try {
-            BasicFileAttributes attr = Files.readAttributes(original, BasicFileAttributes.class);
-            
             FileOutputStream fos = new FileOutputStream(newfile);
             fos.write(content);
             fos.flush();
             fos.close();
+            BasicFileAttributes attr = Files.readAttributes(original, BasicFileAttributes.class);
             Files.setAttribute(finalPath, "creationTime", attr.creationTime());
             Files.setAttribute(finalPath, "lastModifiedTime", attr.lastModifiedTime());
             Files.setAttribute(finalPath, "creationTime", attr.lastAccessTime());
-            
+            Files.setAttribute(finalPath, "dos:readonly", true);
         } catch (Exception e) {
             System.err.format("IO Exception : " + e.getMessage());
         } 
+    }
+    
+    public static void saveToFile(List<String> content, Path savePath, String filename) {
+        Path finalPath = Paths.get(savePath.toString()+"/"+filename);
+        try (FileWriter fw = new FileWriter(finalPath.toString())) {
+            for (String s : content) {
+                fw.write(s);
+            }
+            fw.close();
+            Files.setAttribute(finalPath, "dos:readonly", true);
+        } catch (Exception ex) {
+            System.err.format("IO Exception : " + ex.getMessage());
+        }
     }
     
     public static String getFileExtension(final File file) {
@@ -90,7 +142,8 @@ public abstract class FileProcessor {
             MimeTypes.getDefaultMimeTypes());
     
     public static boolean isWordDocument(final File file) {
-        return ("application/x-tika-ooxml").equalsIgnoreCase(getFileExtension(file));
+        return ("application/vnd.openxmlformats-officedocument.wordprocessingml.document").equalsIgnoreCase(getFileExtension(file))
+                || ("application/msword").equalsIgnoreCase(getFileExtension(file));
     }
     
     public static boolean isTxtDocument(final File file) {
@@ -101,4 +154,12 @@ public abstract class FileProcessor {
         return ("application/pdf").equalsIgnoreCase(getFileExtension(file));
     }
     
+    public static boolean isXlsDocument(final File file) {
+        return ("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet").equalsIgnoreCase(getFileExtension(file))
+                || ("application/vnd.ms-excel").equalsIgnoreCase(getFileExtension(file));
+    }
+    
+    public static boolean isPptDocument(final File file) {
+        return ("application/vnd.openxmlformats-officedocument.presentationml.presentation").equalsIgnoreCase(getFileExtension(file));
+    }
 }
