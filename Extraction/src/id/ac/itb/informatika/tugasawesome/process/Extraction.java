@@ -26,7 +26,7 @@ public class Extraction {
     public static byte[] extract(byte[] cipher, List<GfPolynomial> poly, List<String> guess, int threshold) {
         
         if (guess.size() < threshold) {
-            System.err.format("minimal number of guess is " + threshold);
+//            System.err.format("minimal number of guess is " + threshold);
             return null;
         }
         
@@ -89,7 +89,9 @@ public class Extraction {
         String rootPath = args[0];
         List<String> wordQuery = Arrays.asList(Arrays.copyOfRange(args, 2, args.length));
         String outputPath = args[1];
-                
+        
+        long startTime = System.nanoTime();
+        
         //Load meta file
         FileInputStream fis = new FileInputStream(rootPath + "/meta.ser");
         ObjectInputStream in = new ObjectInputStream(fis);
@@ -103,7 +105,8 @@ public class Extraction {
         List<Path> listFile = new ArrayList<>();
         Files.walk(Paths.get(rootPath)).forEach(filePath -> {
             if (Files.isRegularFile(filePath) && 
-                !filePath.getFileName().toString().equalsIgnoreCase("meta.ser")) {
+                !filePath.getFileName().toString().equalsIgnoreCase("meta.ser") &&
+                !filePath.getFileName().toString().equalsIgnoreCase("md5.txt")) {
                 listFile.add(filePath);
             }
         });
@@ -114,8 +117,6 @@ public class Extraction {
             return;
         }
         
-        System.out.println(listFile);
-        
         System.out.println("Searching started with query : " + wordQuery);
         boolean found = false;
         
@@ -123,17 +124,21 @@ public class Extraction {
         Path toSave = Paths.get(outputPath);
         
         for (int idx = 0; idx <listFile.size(); idx++) {
-            byte[] fileCipher = FileProcessor.readFileAsBytes(listFile.get(idx));
-            byte[] plain = Extraction.extract(fileCipher, allpolynomials.get(idx), wordQuery, threshold);
-            if (plain != null) {
-                System.out.println("Found in file " + listFile.get(idx));
-                FileProcessor.saveToFile(plain, toSave, listFile.get(idx));
-                found = true;
+            if (allpolynomials.get(idx).size() > 0){
+                System.out.println(allpolynomials.get(idx));
+                byte[] fileCipher = FileProcessor.readFileAsBytes(listFile.get(idx));
+                byte[] plain = Extraction.extract(fileCipher, allpolynomials.get(idx), wordQuery, threshold);
+                if (plain != null) {
+                    System.out.println("Found in file " + listFile.get(idx));
+                    FileProcessor.saveToFile(plain, toSave, listFile.get(idx));
+                    found = true;
+                }
             }
         }
         
         if (!found) {
             System.out.println("Not found");
         } 
+        System.out.println("Finished in : " + (System.nanoTime()-startTime)/1000000L + " ms");
     }
 }

@@ -53,7 +53,7 @@ public class Protection {
         return mappingFunction;
     }
     
-    public static void main(String args[]) throws IOException, Exception {
+    public static void main(String args[]) throws Exception {
         if (args.length < 3) {
             System.out.println("Invalid argument.");
             System.out.println("Usage : java -jar Protection.jar <root_file_path> <threshold> <output>");
@@ -82,7 +82,8 @@ public class Protection {
             if (Files.isRegularFile(filePath)) {
                 long subTime = System.nanoTime();
                 
-                //TODO : count md5 each file
+                String hashCheck = filePath.toString() + " " +FileProcessor.getMd5(filePath);
+                md5.add(hashCheck);
                 
                 byte[] filePlain = FileProcessor.readFileAsBytes(filePath);
                 byte[] key = Encryption.generateKey();
@@ -92,13 +93,17 @@ public class Protection {
 
                 //P.2 and P.3
                 List<String> wordsInFile = FileProcessor.readFile(filePath);
-                if (wordsInFile.size() > 0) {
+                if (wordsInFile != null && wordsInFile.size() > 0) {
                     String filetype = FileProcessor.getFileExtension(filePath.toFile());
                     List<GfPolynomial> poly = protect(wordsInFile, key, threshold);
                     allpolynomials.add(poly);
                 
                     long subTime2 = System.nanoTime() - subTime;
                     System.out.println(filePath + " " + filetype + " " + wordsInFile.size() + " " + subTime2/1000000L+ "ms");
+                    System.out.println(poly);
+                }else {
+                    List<GfPolynomial> poly = new ArrayList<>();
+                    allpolynomials.add(poly);
                 }
             }
         });
@@ -114,6 +119,9 @@ public class Protection {
         fos.close();
         System.out.println("Meta files saved in " + outputPath+"/meta.ser");
         
+        //Save hash to file
+        FileProcessor.saveToFile(md5, Paths.get(outputPath), "md5.txt");
+        System.out.println("Md5 files saved in " + outputPath+"/md5.txt");
     }
     
 }

@@ -6,15 +6,17 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.apache.tika.config.TikaConfig;
 import org.apache.tika.detect.DefaultDetector;
 import org.apache.tika.detect.Detector;
 import org.apache.tika.io.TikaInputStream;
@@ -36,17 +38,21 @@ public abstract class FileProcessor {
     public static List<String> readFile(Path path) {
         String content = getText(path);
          
-         Set<String> setVal = new HashSet<>();
-         String pattern = "[^\\w]"; //split with anything but word
-         String pattern2 = "^[0-9]*$"; //eliminate all number only
-         String[] splitted = content.split(pattern);
-         for (String a : splitted) {
-             if (a.trim().length() > 0 && !a.matches(pattern2)) {
-                 setVal.add(a.toLowerCase());
-             }
-         }
-         
-        return new ArrayList<>(setVal);
+        if (content != null) {
+            Set<String> setVal = new HashSet<>();
+            String pattern = "[^\\w]"; //split with anything but word
+            String pattern2 = "^[0-9]*$"; //eliminate all number only
+            String[] splitted = content.split(pattern);
+            for (String a : splitted) {
+                if (a.trim().length() > 0 && !a.matches(pattern2)) {
+                    setVal.add(a.toLowerCase());
+                }
+            }
+
+            return new ArrayList<>(setVal);
+        } else {
+            return null;
+        }
     }
     
     private static String getText(Path path) {
@@ -60,7 +66,7 @@ public abstract class FileProcessor {
             parser.parse(stream, handler, metadata, context);
             return handler.toString();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.format("Exception : " + e.getMessage());
             return null;
         }
     }
@@ -117,12 +123,29 @@ public abstract class FileProcessor {
         Path finalPath = Paths.get(savePath.toString()+"/"+filename);
         try (FileWriter fw = new FileWriter(finalPath.toString())) {
             for (String s : content) {
-                fw.write(s);
+                fw.write(s+"\n");
             }
             fw.close();
             Files.setAttribute(finalPath, "dos:readonly", true);
         } catch (Exception ex) {
             System.err.format("IO Exception : " + ex.getMessage());
+        }
+    }
+    
+    public static String getMd5(Path filepath) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            FileInputStream in = new FileInputStream(filepath.toFile());
+            byte[] data = new byte[1024];
+            int nread = 0;
+            while((nread = in.read(data)) != -1) {
+                md.update(data, 0, nread);
+            }
+            byte[] digest = md.digest();
+            return Operations.toHex(digest);
+        } catch (Exception e) {
+            System.err.format("Hash Exception : " + e.getMessage());
+            return null;
         }
     }
     
@@ -133,7 +156,7 @@ public abstract class FileProcessor {
            
             return DETECTOR.detect(tikaIS, metadata).toString();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.format("Exception : " + e.getMessage());
             return null;
         }
     }

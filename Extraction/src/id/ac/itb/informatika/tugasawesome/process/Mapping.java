@@ -54,7 +54,7 @@ public class Mapping {
     public static int getSubFunctionIdx(String word) {
         byte[] hash = Hash(word.getBytes(), DUMMYSALT.getBytes());
         PointByte hashPoint = new PointByte(hash, BigInteger.ONE, false);
-        int idx = hashPoint.getX().mod(new BigInteger("15")).intValueExact();
+        int idx = hashPoint.getX().mod(new BigInteger("16")).intValueExact();
         return idx;
     }
 

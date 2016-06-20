@@ -95,6 +95,10 @@ public class Mapping {
         List<GfPolynomial> result = new ArrayList<>();
         
         List<List<PointByte>> points = new ArrayList<>();
+        for (int i=0; i<16; ++i) {
+            List<PointByte> el = new ArrayList<>();
+            points.add(el);
+        }
         
         //find point for each corresponding subfuntion
         for (int i = 0; i< hashResult.size(); i++) {
@@ -103,7 +107,7 @@ public class Mapping {
             } 
             BigInteger valY = hashResult.get(i).getY().xor(shares.get(i).getY());
             PointByte a = new PointByte(shares.get(i).getX(), valY, prime, false);
-            BigInteger index = hashResult.get(i).getX().mod(new BigInteger("15"));
+            BigInteger index = hashResult.get(i).getX().mod(new BigInteger("16"));
             points.get(index.intValueExact()).add(a);
         }
         
