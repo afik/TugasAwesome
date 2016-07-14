@@ -54,6 +54,18 @@ public class Protection {
     }
     
     public static void main(String args[]) throws Exception {
+//        Path input = Paths.get("D:\\AFIK\\Project\\T(ugas) A(wesome)\\test\\coloken 1080p.mp4");
+//        Path output = Paths.get("D:\\AFIK\\Project\\T(ugas) A(wesome)\\output");
+//        byte[] key = Encryption.generateKey();
+//        Encryption.encryptLarge(input, output, key);
+//        
+//        Path enc = Paths.get("D:\\AFIK\\Project\\T(ugas) A(wesome)\\output\\coloken 1080p.mp4");
+//        Path result = Paths.get("D:\\AFIK\\Project\\T(ugas) A(wesome)\\result");
+//        byte[] file = FileProcessor.readFirstBytes(enc);
+//        System.out.println(file.length);
+//        System.out.println(Encryption.checkFirstBlock(Operations.getFirstBlock(file, 16), key));
+//        Encryption.decryptLarge(enc, result, key);
+        
         if (args.length < 3) {
             System.out.println("Invalid argument.");
             System.out.println("Usage : java -jar Protection.jar <root_file_path> <threshold> <output>");
@@ -85,12 +97,9 @@ public class Protection {
                 String hashCheck = filePath.toString() + " " +FileProcessor.getMd5(filePath);
                 md5.add(hashCheck);
                 
-                byte[] filePlain = FileProcessor.readFileAsBytes(filePath);
                 byte[] key = Encryption.generateKey();
-                byte[] cipher = Encryption.encrypt(filePlain, key);
+                Encryption.encryptLarge(filePath, toSave, key);
                 
-                FileProcessor.saveToFile(cipher, toSave, filePath);
-
                 //P.2 and P.3
                 List<String> wordsInFile = FileProcessor.readFile(filePath);
                 if (wordsInFile != null && wordsInFile.size() > 0) {
@@ -100,7 +109,7 @@ public class Protection {
                 
                     long subTime2 = System.nanoTime() - subTime;
                     System.out.println(filePath + " " + filetype + " " + wordsInFile.size() + " " + subTime2/1000000L+ "ms");
-                    System.out.println(poly);
+                    System.out.println(poly.get(15));
                 }else {
                     List<GfPolynomial> poly = new ArrayList<>();
                     allpolynomials.add(poly);

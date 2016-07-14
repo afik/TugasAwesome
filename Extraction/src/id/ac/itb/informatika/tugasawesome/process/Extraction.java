@@ -23,11 +23,11 @@ import java.util.List;
  */
 public class Extraction {
     
-    public static byte[] extract(byte[] cipher, List<GfPolynomial> poly, List<String> guess, int threshold) {
+    public static boolean extract(Path cipherPath, Path toSave, List<GfPolynomial> poly, List<String> guess, int threshold) {
         
         if (guess.size() < threshold) {
 //            System.err.format("minimal number of guess is " + threshold);
-            return null;
+            return false;
         }
         
         //E.1 Compute each share
@@ -62,7 +62,8 @@ public class Extraction {
             }
             
             //E.2 Try to decrypt
-            if (Encryption.checkFirstBlock(Operations.getFirstBlock(cipher, 16), key.toByteArray())) {
+            byte[] firstBlock = FileProcessor.readFirstBytes(cipherPath);
+            if (Encryption.checkFirstBlock(Operations.getFirstBlock(firstBlock, 16), key.toByteArray())) {
                 success = true;
                 break;
             } 
@@ -70,11 +71,9 @@ public class Extraction {
         }
 
         if (success) {
-            byte[] decrypted = Encryption.decrypt(cipher, key.toByteArray());
-            byte[] plain2 = Arrays.copyOfRange(decrypted, 16, decrypted.length);
-            return plain2;
+            return Encryption.decryptLarge(cipherPath, toSave, key.toByteArray());
         } else {
-            return null;   
+            return false;   
         }
 
     }
@@ -125,12 +124,11 @@ public class Extraction {
         
         for (int idx = 0; idx <listFile.size(); idx++) {
             if (allpolynomials.get(idx).size() > 0){
-                System.out.println(allpolynomials.get(idx));
-                byte[] fileCipher = FileProcessor.readFileAsBytes(listFile.get(idx));
-                byte[] plain = Extraction.extract(fileCipher, allpolynomials.get(idx), wordQuery, threshold);
-                if (plain != null) {
+                System.out.println(listFile.get(idx));
+                System.out.println(allpolynomials.get(idx).get(15));
+                boolean success = Extraction.extract(listFile.get(idx), toSave, allpolynomials.get(idx), wordQuery, threshold);
+                if (success) {
                     System.out.println("Found in file " + listFile.get(idx));
-                    FileProcessor.saveToFile(plain, toSave, listFile.get(idx));
                     found = true;
                 }
             }

@@ -45,6 +45,31 @@ public class FileProcessor {
         return bos.toByteArray();
     }
     
+    public static byte[] readFirstBytes(Path path) {
+        File file = path.toFile();
+        FileInputStream fin = null;
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try {
+            fin = new FileInputStream(file);
+            byte[] buf = new byte[1024];
+            int readNum = 0;
+            while ((readNum = fin.read(buf))!=-1 && bos.size() < 9216) {
+                bos.write(buf, 0, readNum);
+            }
+        } catch (Exception e) {
+            System.err.format("IO Exception : " + e.getMessage());
+        } finally {
+            try {
+                if (fin != null) {
+                    fin.close();
+                } 
+            } catch (Exception e) {
+                System.err.format("IO Exception : " + e.getMessage());
+            }
+        }
+        return bos.toByteArray();
+    }
+    
     public static void saveToFile(byte[] content, Path savePath, Path original) {
         Path finalPath = Paths.get(savePath.toString() + "/" + original.getFileName().toString());
         File newfile = new File(finalPath.toString());

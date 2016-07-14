@@ -6,8 +6,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -77,18 +80,94 @@ public class Encryption {
             cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
             
             int count;
-            byte[] buffer = new byte[8192];
-            FileInputStream in = new FileInputStream(plain.toFile());
+            byte[] buffer = new byte[16];
             Path finalPath = Paths.get(saveTo.toString() + "/" + plain.getFileName().toString());
             File newfile = new File(finalPath.toString());
-            CipherOutputStream out = new CipherOutputStream(new FileOutputStream(newfile), cipher);
+            
+            FileInputStream in = new FileInputStream(plain.toFile());
+            FileOutputStream fos = new FileOutputStream(newfile);
+            CipherOutputStream out = new CipherOutputStream(fos, cipher);
+            out.write(PAD, 0, 16);
             while ((count = in.read(buffer)) > 0) {
                 out.write(buffer, 0, count);
             }
+            out.close();
+            fos.close();
             
+            BasicFileAttributes attr = Files.readAttributes(plain, BasicFileAttributes.class);
+            Files.setAttribute(finalPath, "creationTime", attr.creationTime());
+            Files.setAttribute(finalPath, "lastModifiedTime", attr.lastModifiedTime());
+            Files.setAttribute(finalPath, "creationTime", attr.lastAccessTime());
+            Files.setAttribute(finalPath, "dos:readonly", true);
         } catch (Exception  e) {
             System.err.format("Encrypt exception : " + e.getMessage());
+            e.printStackTrace();
         }
+    }
+    
+    public static void decryptLarge(Path encrypted, Path saveTo, byte[] key) {
+        try {
+            Cipher cipher = Cipher.getInstance(TRANSFORMATION);
+            SecretKeySpec keySpec = new SecretKeySpec(key, ALGORITHM);
+            IvParameterSpec ivSpec = new IvParameterSpec(IV.getBytes("UTF-8"));
+            cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
+            
+            int count;
+            byte[] buffer = new byte[16];
+            Path finalPath = Paths.get(saveTo.toString() + "/" + encrypted.getFileName().toString());
+            
+            //encrypt to temporary
+            File temp = File.createTempFile("ppdef",".tmp", saveTo.toFile());
+            FileInputStream in = new FileInputStream(encrypted.toFile());
+            FileOutputStream fos = new FileOutputStream(temp);
+            CipherOutputStream out = new CipherOutputStream(fos, cipher);
+
+            while ((count = in.read(buffer)) > 0) {
+                out.write(buffer, 0, count);
+            }
+            in.close();
+            out.close();
+            fos.close();
+            
+            //remove padding
+            File newfile = new File(finalPath.toString());
+            FileInputStream in2 = new FileInputStream(temp);
+            FileOutputStream out2 = new FileOutputStream(newfile);
+            byte[] buf = new byte[16];
+            in2.read(buf);
+            while((count = in2.read(buffer)) > 0) {
+                out2.write(buffer, 0, count);
+            }
+            in2.close();
+            out2.close();
+            
+            temp.delete();
+            
+            BasicFileAttributes attr = Files.readAttributes(encrypted, BasicFileAttributes.class);
+            System.out.println("atribut " + attr.creationTime() + " " + attr.lastAccessTime() + " " +attr.lastModifiedTime());
+            Files.setAttribute(finalPath, "creationTime", attr.creationTime());
+            Files.setAttribute(finalPath, "lastModifiedTime", attr.lastModifiedTime());
+            Files.setAttribute(finalPath, "creationTime", attr.lastAccessTime());
+            Files.setAttribute(finalPath, "dos:readonly", true);
+        } catch (Exception  e) {
+            System.err.format("Encrypt exception : " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    public static boolean checkFirstBlock(byte[] firstBlock, byte[] key) {
+        byte[] plain = null;
+        try {
+            Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+            SecretKeySpec keySpec = new SecretKeySpec(key, ALGORITHM);
+            IvParameterSpec ivSpec = new IvParameterSpec(IV.getBytes("UTF-8"));
+            cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
+            
+            plain =  cipher.doFinal(firstBlock);
+        } catch (Exception e) {
+            System.err.format("Encrypt exception : " + e.getMessage());
+        }
+        return Arrays.equals(plain, PAD);
     }
     
 }

@@ -1,7 +1,15 @@
 package id.ac.itb.informatika.tugasawesome.process;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import javax.crypto.Cipher;
+import javax.crypto.CipherOutputStream;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -52,6 +60,59 @@ public class Encryption {
             System.err.format("Encrypt exception : " + e.getMessage());
         }
         return Arrays.equals(plain, PAD);
+    }
+    
+    
+    public static boolean decryptLarge(Path encrypted, Path saveTo, byte[] key) {
+        try {
+            Cipher cipher = Cipher.getInstance(TRANSFORMATION);
+            SecretKeySpec keySpec = new SecretKeySpec(key, ALGORITHM);
+            IvParameterSpec ivSpec = new IvParameterSpec(IV.getBytes("UTF-8"));
+            cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
+            
+            int count;
+            byte[] buffer = new byte[16];
+            Path finalPath = Paths.get(saveTo.toString() + "/" + encrypted.getFileName().toString());
+            
+            //encrypt to temporary
+            File temp = File.createTempFile("ppdef",".tmp", saveTo.toFile());
+            FileInputStream in = new FileInputStream(encrypted.toFile());
+            FileOutputStream fos = new FileOutputStream(temp);
+            CipherOutputStream out = new CipherOutputStream(fos, cipher);
+
+            while ((count = in.read(buffer)) > 0) {
+                out.write(buffer, 0, count);
+            }
+            in.close();
+            out.close();
+            fos.close();
+            
+            //remove padding
+            File newfile = new File(finalPath.toString());
+            FileInputStream in2 = new FileInputStream(temp);
+            FileOutputStream out2 = new FileOutputStream(newfile);
+            byte[] buf = new byte[16];
+            in2.read(buf);
+            while((count = in2.read(buffer)) > 0) {
+                out2.write(buffer, 0, count);
+            }
+            in2.close();
+            out2.close();
+            
+            temp.delete();
+            
+            BasicFileAttributes attr = Files.readAttributes(encrypted, BasicFileAttributes.class);
+            System.out.println("atribut " + attr.creationTime() + " " + attr.lastAccessTime() + " " +attr.lastModifiedTime());
+            Files.setAttribute(finalPath, "creationTime", attr.creationTime());
+            Files.setAttribute(finalPath, "lastModifiedTime", attr.lastModifiedTime());
+            Files.setAttribute(finalPath, "creationTime", attr.lastAccessTime());
+            Files.setAttribute(finalPath, "dos:readonly", true);
+            
+            return true;
+        } catch (Exception  e) {
+            System.err.format("Encrypt exception : " + e.getMessage());
+            return false;
+        } 
     }
     
 }
