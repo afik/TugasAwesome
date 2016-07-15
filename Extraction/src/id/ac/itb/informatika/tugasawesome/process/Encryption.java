@@ -102,10 +102,9 @@ public class Encryption {
             temp.delete();
             
             BasicFileAttributes attr = Files.readAttributes(encrypted, BasicFileAttributes.class);
-            System.out.println("atribut " + attr.creationTime() + " " + attr.lastAccessTime() + " " +attr.lastModifiedTime());
             Files.setAttribute(finalPath, "creationTime", attr.creationTime());
             Files.setAttribute(finalPath, "lastModifiedTime", attr.lastModifiedTime());
-            Files.setAttribute(finalPath, "creationTime", attr.lastAccessTime());
+            Files.setAttribute(finalPath, "lastAccessTime", attr.lastAccessTime());
             Files.setAttribute(finalPath, "dos:readonly", true);
             
             return true;

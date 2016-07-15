@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Set;
 import org.apache.tika.detect.DefaultDetector;
 import org.apache.tika.detect.Detector;
+import org.apache.tika.exception.TikaException;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.mime.MimeTypes;
@@ -26,6 +27,7 @@ import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.BodyContentHandler;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -35,7 +37,7 @@ public abstract class FileProcessor {
     
     public FileProcessor() {}
     
-    public static List<String> readFile(Path path) {
+    public static List<String> readFile(Path path) throws ClassNotFoundException, NoClassDefFoundError{
         String content = getText(path);
          
         if (content != null) {
@@ -55,7 +57,7 @@ public abstract class FileProcessor {
         }
     }
     
-    private static String getText(Path path) {
+    private static String getText(Path path) throws ClassNotFoundException, NoClassDefFoundError{
         try{
             File file = path.toFile();
             Parser parser = new AutoDetectParser();
@@ -65,7 +67,7 @@ public abstract class FileProcessor {
             ParseContext context = new ParseContext();
             parser.parse(stream, handler, metadata, context);
             return handler.toString();
-        } catch (Exception e) {
+        } catch (SAXException | IOException | TikaException e) {
             System.err.format("Exception : " + e.getMessage());
             return null;
         }
@@ -137,7 +139,7 @@ public abstract class FileProcessor {
             BasicFileAttributes attr = Files.readAttributes(original, BasicFileAttributes.class);
             Files.setAttribute(finalPath, "creationTime", attr.creationTime());
             Files.setAttribute(finalPath, "lastModifiedTime", attr.lastModifiedTime());
-            Files.setAttribute(finalPath, "creationTime", attr.lastAccessTime());
+            Files.setAttribute(finalPath, "lastAccessTime", attr.lastAccessTime());
             Files.setAttribute(finalPath, "dos:readonly", true);
         } catch (Exception e) {
             System.err.format("IO Exception : " + e.getMessage());

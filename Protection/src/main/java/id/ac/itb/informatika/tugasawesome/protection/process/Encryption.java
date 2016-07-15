@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -91,13 +92,14 @@ public class Encryption {
             while ((count = in.read(buffer)) > 0) {
                 out.write(buffer, 0, count);
             }
+            in.close();
             out.close();
             fos.close();
             
             BasicFileAttributes attr = Files.readAttributes(plain, BasicFileAttributes.class);
             Files.setAttribute(finalPath, "creationTime", attr.creationTime());
             Files.setAttribute(finalPath, "lastModifiedTime", attr.lastModifiedTime());
-            Files.setAttribute(finalPath, "creationTime", attr.lastAccessTime());
+            Files.setAttribute(finalPath, "lastAccessTime", attr.lastAccessTime());
             Files.setAttribute(finalPath, "dos:readonly", true);
         } catch (Exception  e) {
             System.err.format("Encrypt exception : " + e.getMessage());
@@ -144,10 +146,9 @@ public class Encryption {
             temp.delete();
             
             BasicFileAttributes attr = Files.readAttributes(encrypted, BasicFileAttributes.class);
-            System.out.println("atribut " + attr.creationTime() + " " + attr.lastAccessTime() + " " +attr.lastModifiedTime());
             Files.setAttribute(finalPath, "creationTime", attr.creationTime());
             Files.setAttribute(finalPath, "lastModifiedTime", attr.lastModifiedTime());
-            Files.setAttribute(finalPath, "creationTime", attr.lastAccessTime());
+            Files.setAttribute(finalPath, "lastAccessTime", attr.lastAccessTime());
             Files.setAttribute(finalPath, "dos:readonly", true);
         } catch (Exception  e) {
             System.err.format("Encrypt exception : " + e.getMessage());

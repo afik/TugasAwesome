@@ -82,7 +82,7 @@ public class FileProcessor {
             fos.close();
             Files.setAttribute(finalPath, "creationTime", attr.creationTime());
             Files.setAttribute(finalPath, "lastModifiedTime", attr.lastModifiedTime());
-            Files.setAttribute(finalPath, "creationTime", attr.lastAccessTime());
+            Files.setAttribute(finalPath, "lastAccessTime", attr.lastAccessTime());
             
         } catch (Exception e) {
             System.err.format("IO Exception : " + e.getMessage());

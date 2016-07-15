@@ -125,7 +125,7 @@ public class Extraction {
         for (int idx = 0; idx <listFile.size(); idx++) {
             if (allpolynomials.get(idx).size() > 0){
                 System.out.println(listFile.get(idx));
-                System.out.println(allpolynomials.get(idx).get(15));
+//                System.out.println(allpolynomials.get(idx).get(15));
                 boolean success = Extraction.extract(listFile.get(idx), toSave, allpolynomials.get(idx), wordQuery, threshold);
                 if (success) {
                     System.out.println("Found in file " + listFile.get(idx));

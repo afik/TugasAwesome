@@ -54,12 +54,12 @@ public class Protection {
     }
     
     public static void main(String args[]) throws Exception {
-//        Path input = Paths.get("D:\\AFIK\\Project\\T(ugas) A(wesome)\\test\\coloken 1080p.mp4");
+//        Path input = Paths.get("D:\\AFIK\\Project\\T(ugas) A(wesome)\\test\\testFile_4.pdf");
 //        Path output = Paths.get("D:\\AFIK\\Project\\T(ugas) A(wesome)\\output");
 //        byte[] key = Encryption.generateKey();
 //        Encryption.encryptLarge(input, output, key);
 //        
-//        Path enc = Paths.get("D:\\AFIK\\Project\\T(ugas) A(wesome)\\output\\coloken 1080p.mp4");
+//        Path enc = Paths.get("D:\\AFIK\\Project\\T(ugas) A(wesome)\\output\\testFile_4.pdf");
 //        Path result = Paths.get("D:\\AFIK\\Project\\T(ugas) A(wesome)\\result");
 //        byte[] file = FileProcessor.readFirstBytes(enc);
 //        System.out.println(file.length);
@@ -91,29 +91,33 @@ public class Protection {
         System.out.println("Protection started with threshold : " + threshold);
         long startTime = System.nanoTime();
         Files.walk(Paths.get(rootPath)).forEach(filePath -> {
-            if (Files.isRegularFile(filePath)) {
-                long subTime = System.nanoTime();
-                
-                String hashCheck = filePath.toString() + " " +FileProcessor.getMd5(filePath);
-                md5.add(hashCheck);
-                
-                byte[] key = Encryption.generateKey();
-                Encryption.encryptLarge(filePath, toSave, key);
-                
-                //P.2 and P.3
-                List<String> wordsInFile = FileProcessor.readFile(filePath);
-                if (wordsInFile != null && wordsInFile.size() > 0) {
-                    String filetype = FileProcessor.getFileExtension(filePath.toFile());
-                    List<GfPolynomial> poly = protect(wordsInFile, key, threshold);
-                    allpolynomials.add(poly);
-                
-                    long subTime2 = System.nanoTime() - subTime;
-                    System.out.println(filePath + " " + filetype + " " + wordsInFile.size() + " " + subTime2/1000000L+ "ms");
-                    System.out.println(poly.get(15));
-                }else {
-                    List<GfPolynomial> poly = new ArrayList<>();
-                    allpolynomials.add(poly);
+            try {
+                if (Files.isRegularFile(filePath)) {
+                    long subTime = System.nanoTime();
+
+                    String hashCheck = filePath.toString() + " " +FileProcessor.getMd5(filePath);
+                    md5.add(hashCheck);
+
+                    byte[] key = Encryption.generateKey();
+                    Encryption.encryptLarge(filePath, toSave, key);
+
+                    //P.2 and P.3
+                    List<String> wordsInFile = FileProcessor.readFile(filePath);
+                    if (wordsInFile != null && wordsInFile.size() > 0) {
+                        String filetype = FileProcessor.getFileExtension(filePath.toFile());
+                        List<GfPolynomial> poly = protect(wordsInFile, key, threshold);
+                        allpolynomials.add(poly);
+
+                        long subTime2 = System.nanoTime() - subTime;
+                        System.out.println(filePath + " " + filetype + " " + wordsInFile.size() + " " + subTime2/1000000L+ "ms");
+    //                    System.out.println(poly.get(15));
+                    }else {
+                        List<GfPolynomial> poly = new ArrayList<>();
+                        allpolynomials.add(poly);
+                    }
                 }
+            } catch (ClassNotFoundException | NoClassDefFoundError ex) {
+                System.out.println("File " + filePath + " not recognized.");
             }
         });
         long totalTime = System.nanoTime() - startTime;
