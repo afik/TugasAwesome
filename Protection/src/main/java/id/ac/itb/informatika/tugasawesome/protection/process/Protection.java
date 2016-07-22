@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -76,14 +77,14 @@ public class Protection {
         int threshold = Integer.valueOf(args[1]);
         String outputPath = args[2];
         
-        List<List<GfPolynomial>> allpolynomials = new ArrayList<>();
+        HashMap<String, List<GfPolynomial>> allpolynomials = new HashMap<>();
         List<String> md5 = new ArrayList<>();
         
         //threshold value stored in GfPoly for serialization
         GfPolynomial thPoly = new GfPolynomial (threshold);
         List<GfPolynomial> p = new ArrayList<>();
         p.add(thPoly);
-        allpolynomials.add(p);
+        allpolynomials.put("threshold", p);
         
         new File(outputPath).mkdir();
         Path toSave = Paths.get(outputPath);
@@ -99,6 +100,7 @@ public class Protection {
                     md5.add(hashCheck);
 
                     byte[] key = Encryption.generateKey();
+                    System.out.println(new BigInteger(key));
                     Encryption.encryptLarge(filePath, toSave, key);
 
                     //P.2 and P.3
@@ -106,14 +108,14 @@ public class Protection {
                     if (wordsInFile != null && wordsInFile.size() > 0) {
                         String filetype = FileProcessor.getFileExtension(filePath.toFile());
                         List<GfPolynomial> poly = protect(wordsInFile, key, threshold);
-                        allpolynomials.add(poly);
-
+                        allpolynomials.put(filePath.getFileName().toString(), poly);
+                        
                         long subTime2 = System.nanoTime() - subTime;
                         System.out.println(filePath + " " + filetype + " " + wordsInFile.size() + " " + subTime2/1000000L+ "ms");
-    //                    System.out.println(poly.get(15));
+                        System.out.println("poly " + poly.get(0).toString());
                     }else {
                         List<GfPolynomial> poly = new ArrayList<>();
-                        allpolynomials.add(poly);
+                        allpolynomials.put(filePath.getFileName().toString(), poly);
                     }
                 }
             } catch (ClassNotFoundException | NoClassDefFoundError ex) {

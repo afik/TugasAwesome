@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -94,12 +95,11 @@ public class Extraction {
         //Load meta file
         FileInputStream fis = new FileInputStream(rootPath + "/meta.ser");
         ObjectInputStream in = new ObjectInputStream(fis);
-        List<List<GfPolynomial>> allpolynomials = (List) in.readObject();
+        HashMap<String, List<GfPolynomial>> allpolynomials = (HashMap) in.readObject();
         in.close();
         fis.close();
         
-        int threshold = allpolynomials.get(0).get(0).getDegree();
-        allpolynomials.remove(0);
+        int threshold = allpolynomials.get("threshold").get(0).getDegree();
         
         List<Path> listFile = new ArrayList<>();
         Files.walk(Paths.get(rootPath)).forEach(filePath -> {
@@ -111,7 +111,7 @@ public class Extraction {
         });
         
         
-        if (listFile.size() != allpolynomials.size()) {
+        if (listFile.size() != allpolynomials.size()-1) {
             System.err.format("Invalid meta file\n");
             return;
         }
@@ -123,10 +123,10 @@ public class Extraction {
         Path toSave = Paths.get(outputPath);
         
         for (int idx = 0; idx <listFile.size(); idx++) {
-            if (allpolynomials.get(idx).size() > 0){
+            if (allpolynomials.get(listFile.get(idx).getFileName().toString()).size() > 0){
                 System.out.println(listFile.get(idx));
-//                System.out.println(allpolynomials.get(idx).get(15));
-                boolean success = Extraction.extract(listFile.get(idx), toSave, allpolynomials.get(idx), wordQuery, threshold);
+                List<GfPolynomial> thisPoly = allpolynomials.get(listFile.get(idx).getFileName().toString());
+                boolean success = Extraction.extract(listFile.get(idx), toSave, thisPoly, wordQuery, threshold);
                 if (success) {
                     System.out.println("Found in file " + listFile.get(idx));
                     found = true;
