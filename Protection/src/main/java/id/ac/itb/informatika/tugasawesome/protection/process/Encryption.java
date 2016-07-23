@@ -7,10 +7,8 @@ import java.io.FileOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -103,7 +101,6 @@ public class Encryption {
             Files.setAttribute(finalPath, "dos:readonly", true);
         } catch (Exception  e) {
             System.err.format("Encrypt exception : " + e.getMessage());
-            e.printStackTrace();
         }
     }
     
@@ -152,7 +149,6 @@ public class Encryption {
             Files.setAttribute(finalPath, "dos:readonly", true);
         } catch (Exception  e) {
             System.err.format("Encrypt exception : " + e.getMessage());
-            e.printStackTrace();
         }
     }
     

@@ -66,5 +66,14 @@ public final class Shamir {
         return coef;
     }
     
+    /**
+     * Get smallest 129 bit prime number
+     */
+    public static BigInteger getPrime() {
+        //340282366920938463463374607431768211455 is largest number with 128 bit length
+        return new BigInteger("340282366920938463463374607431768211455").nextProbablePrime();
+        
+    }
+    
     
 }

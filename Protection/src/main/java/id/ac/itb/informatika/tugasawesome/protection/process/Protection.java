@@ -3,10 +3,8 @@ package id.ac.itb.informatika.tugasawesome.protection.process;
 import id.ac.itb.informatika.tugasawesome.model.GfPolynomial;
 import id.ac.itb.informatika.tugasawesome.model.PointByte;
 import id.ac.itb.informatika.tugasawesome.protection.utils.FileProcessor;
-import id.ac.itb.informatika.tugasawesome.protection.utils.Operations;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -31,7 +29,7 @@ public class Protection {
      */
     public static List<GfPolynomial> protect(List<String> words, byte[] key, int threshold) {
         //P.2 Split the secret
-        BigInteger prime = Operations.getPrime();
+        BigInteger prime = Shamir.getPrime();
         
         List<BigInteger> xBytes = new ArrayList<>();
         List<PointByte> hashResult = Mapping.wordsToPoint(words, prime);
@@ -55,18 +53,6 @@ public class Protection {
     }
     
     public static void main(String args[]) throws Exception {
-//        Path input = Paths.get("D:\\AFIK\\Project\\T(ugas) A(wesome)\\test\\testFile_4.pdf");
-//        Path output = Paths.get("D:\\AFIK\\Project\\T(ugas) A(wesome)\\output");
-//        byte[] key = Encryption.generateKey();
-//        Encryption.encryptLarge(input, output, key);
-//        
-//        Path enc = Paths.get("D:\\AFIK\\Project\\T(ugas) A(wesome)\\output\\testFile_4.pdf");
-//        Path result = Paths.get("D:\\AFIK\\Project\\T(ugas) A(wesome)\\result");
-//        byte[] file = FileProcessor.readFirstBytes(enc);
-//        System.out.println(file.length);
-//        System.out.println(Encryption.checkFirstBlock(Operations.getFirstBlock(file, 16), key));
-//        Encryption.decryptLarge(enc, result, key);
-        
         if (args.length < 3) {
             System.out.println("Invalid argument.");
             System.out.println("Usage : java -jar Protection.jar <root_file_path> <threshold> <output>");
@@ -100,7 +86,6 @@ public class Protection {
                     md5.add(hashCheck);
 
                     byte[] key = Encryption.generateKey();
-                    System.out.println(new BigInteger(key));
                     Encryption.encryptLarge(filePath, toSave, key);
 
                     //P.2 and P.3
@@ -112,7 +97,6 @@ public class Protection {
                         
                         long subTime2 = System.nanoTime() - subTime;
                         System.out.println(filePath + " " + filetype + " " + wordsInFile.size() + " " + subTime2/1000000L+ "ms");
-                        System.out.println("poly " + poly.get(0).toString());
                     }else {
                         List<GfPolynomial> poly = new ArrayList<>();
                         allpolynomials.put(filePath.getFileName().toString(), poly);
@@ -124,7 +108,6 @@ public class Protection {
         });
         long totalTime = System.nanoTime() - startTime;
         System.out.println("Finished in : " + totalTime/ 1000000L + " ms");
-        System.out.println("Total Files : " + (allpolynomials.size()-1));
         
         //Save GF poynomials to file
         FileOutputStream fos = new FileOutputStream(outputPath + "/meta.ser");
