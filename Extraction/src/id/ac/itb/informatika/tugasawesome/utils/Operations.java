@@ -4,7 +4,6 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.DatatypeConverter;
 
 /**
  *
@@ -33,13 +32,6 @@ public class Operations {
     }
     
     /**
-     * Convert byte array to hexstring
-     */
-    public static String toHex(byte[] a) {
-        return DatatypeConverter.printHexBinary(a);
-    }
-    
-    /**
      * Generate random byte array with h between 0 to {size}
      */
     public static BigInteger randomByte() {
@@ -53,15 +45,6 @@ public class Operations {
     }
     
     /**
-     * Get smallest 129 bit prime number
-     */
-    public static BigInteger getPrime() {
-        //340282366920938463463374607431768211455 is largest number with 128 bit length
-        return new BigInteger("340282366920938463463374607431768211455").nextProbablePrime();
-        
-    }
-    
-    /**
      * Combination {threshold} element from 1 - {nShares} integer
      * @param nShares
      * @param threshold
@@ -71,7 +54,7 @@ public class Operations {
         List<List<Integer>> result = new ArrayList<>();
         
         if (threshold == 0) {
-            result.add(new ArrayList<Integer>());
+            result.add(new ArrayList<>());
             return result;
         }
         

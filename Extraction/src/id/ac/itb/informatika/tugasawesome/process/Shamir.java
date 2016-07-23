@@ -2,10 +2,8 @@ package id.ac.itb.informatika.tugasawesome.process;
 
 
 import id.ac.itb.informatika.tugasawesome.model.PointByte;
-import id.ac.itb.informatika.tugasawesome.utils.Operations;
 import id.ac.itb.informatika.tugasawesome.model.GfPolynomial;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
