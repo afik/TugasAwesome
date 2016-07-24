@@ -19,6 +19,8 @@ import java.util.List;
  * @author Khoirunnisa Afifah <khoirunnisa.afik@gmail.com>
  */
 public class Protection {
+    private static int threshold;
+    private static List<String> blacklist;
     
     /**
      * Perform protect algorithm P.2 and P.3
@@ -27,7 +29,7 @@ public class Protection {
      * @param threshold to split key, shouldn't bigger than number of distinct words in {file}
      * @return 
      */
-    public static List<GfPolynomial> protect(List<String> words, byte[] key, int threshold) {
+    public static List<GfPolynomial> protect(List<String> words, byte[] key) {
         //P.2 Split the secret
         BigInteger prime = Shamir.getPrime();
         
@@ -55,13 +57,19 @@ public class Protection {
     public static void main(String args[]) throws Exception {
         if (args.length < 3) {
             System.out.println("Invalid argument.");
-            System.out.println("Usage : java -jar Protection.jar <root_file_path> <threshold> <output>");
+            System.out.println("Usage : java -jar Protection.jar <root_file_path> <threshold> <output_path> <blacklist_path>");
             return;
         }
         
         String rootPath = args[0];
-        int threshold = Integer.valueOf(args[1]);
+        threshold = Integer.valueOf(args[1]);
         String outputPath = args[2];
+        if (args.length == 4) {
+            Path bl = Paths.get(args[3]);
+            blacklist = FileProcessor.readFile(bl);
+        } else {
+            blacklist = null;
+        }
         
         HashMap<String, List<GfPolynomial>> allpolynomials = new HashMap<>();
         List<String> md5 = new ArrayList<>();
@@ -90,9 +98,14 @@ public class Protection {
 
                     //P.2 and P.3
                     List<String> wordsInFile = FileProcessor.readFile(filePath);
+                    
+                    if (wordsInFile.removeAll(blacklist)) {
+                        System.out.println("blacklist found");
+                    }
+                    
                     if (wordsInFile != null && wordsInFile.size() > 0) {
                         String filetype = FileProcessor.getFileExtension(filePath.toFile());
-                        List<GfPolynomial> poly = protect(wordsInFile, key, threshold);
+                        List<GfPolynomial> poly = protect(wordsInFile, key);
                         allpolynomials.put(filePath.getFileName().toString(), poly);
                         
                         long subTime2 = System.nanoTime() - subTime;
@@ -104,6 +117,8 @@ public class Protection {
                 }
             } catch (ClassNotFoundException | NoClassDefFoundError ex) {
                 System.out.println("File " + filePath + " not recognized.");
+                List<GfPolynomial> poly = new ArrayList<>();
+                allpolynomials.put(filePath.getFileName().toString(), poly);
             }
         });
         long totalTime = System.nanoTime() - startTime;
