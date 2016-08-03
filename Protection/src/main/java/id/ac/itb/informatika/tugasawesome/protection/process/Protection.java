@@ -68,7 +68,7 @@ public class Protection {
             Path bl = Paths.get(args[3]);
             blacklist = FileProcessor.readFile(bl);
         } else {
-            blacklist = null;
+            blacklist = new ArrayList<>();
         }
         
         HashMap<String, List<GfPolynomial>> allpolynomials = new HashMap<>();
